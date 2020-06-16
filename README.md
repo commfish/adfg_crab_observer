@@ -15,5 +15,9 @@ Summarise raw crab observer, dockside sampling, and fish ticket data to estimate
 * Fish ticket summaries by fishery and statistical area
 
 ### Products
-1. 
+1. **item1_QO19_dockside** - Size frequency by shell condition of retained catch collected by dockside samplers.
+2. **item2_bycatch_size_frequency** - Size frequency of snow crab caught in every BSAI crab fishery (including the directed snow crab fishery) by sex, shell condition, legal status (i.e., T/F; True = male, CW &geq; 77 mm), and fishery.
+3. **item3_5_QO19_retained_catch** - Fish ticket data for QO19 summarised by statiscal area. Totals are found in the last row.
+4. **item4_total_bycatch** - Point estimates of total catch number and total catch weight (lbs) of snow crab by sex in each crab fishery in which snow crab were caught.
+5. **item3_5_QO19_retained_catch** - Fish ticket data for QO19 summarised by statstical area.
 
