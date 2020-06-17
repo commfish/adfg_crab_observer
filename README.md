@@ -9,10 +9,10 @@ Summarise raw crab observer, dockside sampling, and fish ticket data to estimate
 
 ## Snow crab
 ### Data sources
-* Dockside sampling size frequency by shell condition and sex
-* Observer size frequency of snow crab in all crab fisheries
-* Observer catch species composition in all crab fisheries
-* Fish ticket summaries by fishery and statistical area
+* Dockside sampling size frequency by shell condition and sex (ADF&G database)
+* Observer size frequency of snow crab in all crab fisheries (ADF&G database)
+* Observer catch species composition in all crab fisheries (ADF&G database)
+* Fish ticket summaries by fishery and statistical area (Ocean AK, provided by ADF&G Dutch Harbor staff)
 
 ### Products
 1. **item1_QO19_dockside** - Size frequency by shell condition of retained catch collected by dockside samplers.
@@ -21,3 +21,6 @@ Summarise raw crab observer, dockside sampling, and fish ticket data to estimate
 4. **item4_total_bycatch** - Point estimates of total catch number and total catch weight (lbs) of snow crab by sex in each crab fishery in which snow crab were caught.
 5. **item3_5_QO19_retained_catch** - Fish ticket data for QO19 summarised by statstical area.
 
+## Tanner crab
+### Data sources
+* Fish ticket summaries by trip number (what is trip number...?) fo
