@@ -169,7 +169,7 @@ pot_sum %>%
   # replace missing value with 0
   replace_na(list(tot_catch_number = 0,
                   tot_catch_wt_lbs = 0)) %>%
-  write_csv(., "./snow_crab/output/2019_20/item_4_total_bycatch.csv")
+  write_csv(., "./snow_crab/output/2019_20/item4_total_bycatch.csv")
 
 
 
