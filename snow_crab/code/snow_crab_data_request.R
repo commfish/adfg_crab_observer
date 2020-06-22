@@ -37,7 +37,7 @@ read_csv("./misc/data/calc_weight_parameters.csv") %>%
   filter(species == "snow crab") -> params
 
 # item 1 ----
-## size frequency of retained catch by shell in directed snow crab fishery
+## size frequency of retained catch by shell condition in directed snow crab fishery
 
 
 dock %>%
@@ -60,7 +60,7 @@ dock %>%
   # replace NA with 0
   replace(is.na(.), 0) %>%
   # add total column
-  bind_cols(tibble(total = rowSums(.))) %>%
+  bind_cols(tibble(total = rowSums(.[,-1]))) %>%
   # save output
   write_csv("./snow_crab/output/2019_20/item1_dockside_size_comp.csv")
   
@@ -72,8 +72,7 @@ dock %>%
 
 obs_meas %>%
   # filter for non-directed fisheries in most recent season
-  filter(fishery %in% grep(substring(season, 3, 4), fishery, value = T),
-         substring(fishery, 1, 2) != "QO") %>%
+  filter(fishery %in% grep(substring(season, 3, 4), fishery, value = T)) %>%
   dplyr::select(fishery, sex, size, shell) %>%
   # get a count per group
   count(fishery, sex, size, shell) %>%
