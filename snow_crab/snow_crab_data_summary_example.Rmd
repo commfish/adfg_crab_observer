@@ -1,13 +1,30 @@
-# notes ----
-## fishery data request - snow crab
-## prepared by: Tyler Jackson
-## email: tyler.jackson@alaska.gov
-## last updated: 6/22/2020
+---
+title: "Snow Crab Data Summary Example"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Data Summary
+
+The following document details an example workflow to produce the following output documents:
+
+* **item1_dockside_size_comp.csv** - Size frequency by shell condition of retained catch. Shell conditions lumped into "new" and "old" catagories.
+* **item2_snow_crab_bycatch_size_comp.csv** - Size frequency of snow crab caught in every BSAI crab fishery (including the directed snow crab fishery) by sex, shell condition, legal status (i.e., T/F; True = male, CW ≥ 78 mm), and fishery. Shell conditions lumped into "new" and "old" catagories.
+* **item3_snow_crab_retained_catch.csv** - Total retained live catch and deadloss (from fish ticket data) for the directed snow crab fishery.
+* **item4_total_catch.csv** - Point estimates of total catch number and total catch weight (lbs) of snow crab by sex and legal status group (e.g., female, sublegal, and total legal) in each crab fishery in which snow crab were caught.
+* **item5_snow_crab_fish_ticket_stat_area.csv** - Fish ticket data for the directed snow crab fishery summarised by statstical area.
 
 
+## Example Workflow
+
+### Load libraries, global options, custom functions, and raw data
+```{r, message = F, warning = F}
 # load ----
 ## custom functions and libraries
-source("./misc/code/custom_functions.R")
+source("../misc/code/custom_functions.R")
 
 ## most recent season
 season <- "2019_20"
@@ -15,22 +32,22 @@ season <- "2019_20"
 # data inputs ----
 
 ## dockside data
-dock <- read_csv("./snow_crab/data/SNOWCRAB-1990-2019_dockside.csv")
+dock <- read_csv(here("snow_crab/data", "SNOWCRAB-1990-2019_dockside.csv"))
 
 ## observer crab detail data
-obs_meas <- read_csv("./snow_crab/data/SNOWCRAB-1990-2019_crab_dump.csv")
+obs_meas <- read_csv(here("snow_crab/data", "SNOWCRAB-1990-2019_crab_dump.csv"))
 
 ## count pot data
-pot_sum <- read_csv("./snow_crab/data/SNOWCRAB-1990-2019_potsum.csv")
+pot_sum <- read_csv(here("snow_crab/data", "SNOWCRAB-1990-2019_potsum.csv"))
 
-## stat area fish ticket summary for all fisheries directed catch
-fish_tick <- read_csv("./snow_crab/data/bsai_crab_fish_ticket_summary_stat_area.csv")
+## statistical area fish ticket summary for all fisheries landed catch
+fish_tick <- read_csv(here("snow_crab/data", "bsai_crab_fish_ticket_summary_stat_area.csv"))
+```
 
+### Item 1
+Sum the counts of landed crab (as collected by dockside samplers) by shell condition in 1 mm size bins for the most recent directed snow crab fishery. Shell conditions are lumped into to broader catagories "new" (includes molting, soft, pliable, new) and "old" (includes old, very old, very very old).  
 
-# item 1 ----
-## size frequency of retained catch by shell condition in directed snow crab fishery
-## shell codes are lumped to broad catagories of "new" and "old"
-
+```{r}
 dock %>%
   # uncode fishery
   f_sdr(., col = "fishery", type = "fishery_code") %>%
@@ -43,12 +60,13 @@ dock %>%
   mutate(total = rowSums(.[, which(names(.) %in% shell_levels)])) %>%
   # save output
   write_csv(here("snow_crab/output/2019_20/", "item1_dockside_size_comp.csv"))
-  
-         
-            
-# item 2 ----
-## size frequency of snow crab catch in all BSAI crab fisheries
+```
 
+
+### Item 2
+Sum counts of crab (as measured by at-sea observers) by sex, shell condition (lumped into "new" and "old") and legal status (T/F) in 1 mm size bins for each the most recent BSAI fisheries. Size compositions are produced separately for each fishery, except for BBRKC directed and test fisheries, which are combined. Only snow caught in *measured* pots are included.
+
+```{r}
 obs_meas %>%
   # combine BBRKC directed and test fishery data
   mutate(fishery = gsub("XR", "TR", fishery)) %>%
@@ -62,17 +80,13 @@ obs_meas %>%
   mutate(total = rowSums(.[, which(names(.) %in% shell_levels)])) %>%
   # save output
   write_csv(here("snow_crab/output/2019_20", "item2_snow_crab_observer_size_comp.csv"))
-  
-  
-  
-  
-         
+```
 
 
-# item 3 ----
-## retained catch in numbers and biomass (total for directed fishery)
 
-
+### Item 3
+Sum the raw fish ticket report for the most recent directed fishery across all stat areas to get totals for number and weight (lbs) of live retained crab and deadloss, as well as total effort. Note: *totals at a delivery are expanded from brailer subsample weights and counts*.
+```{r}
 fish_tick %>%
   # sum retained catch across stat areas
   group_by(fishery) %>%
@@ -83,12 +97,10 @@ fish_tick %>%
          opening_year == as.numeric(substring(season, 1, 4))) %>%
   # save output
   write_csv(here("snow_crab/output/2019_20", "item3_snow_crab_retained_catch.csv"))
-
-
-
-# item 4 ----
-## total catch of male and female snow crab in BSAI crab fisheries
-
+```
+### Item 4
+Total catch estimates of snow crab subgroups (sex and legal status group: female, sublegal, total legal) are expanded using counts of each subgroup recorded in observer *count* and *measure* pots. Counts are standardized to CPUE using total observed pots in each fishery (BBRKC directed and test fisheries are combined), and expanded to total catch by multiply by the total fishery effort as provided via fish ticket summaries. Total catch weight (lbs) is estimated by multiplying total catch number by the average weight of a crab for each subgroup in that fishery, which is estimated from *measure* pot data. Note: *total catch estimates are provided here as point estimates without associated variance, for now*.
+```{r}
 ### prepare avg wt for biomass expansion
 obs_meas %>%
   # combine BBRKC directed and test fishery data
@@ -146,14 +158,17 @@ pot_sum %>%
                   tot_catch_wt = 0)) %>%
   # save output
   write_csv(., here("snow_crab/output/2019_20", "item4_total_catch.csv"))
+```
 
 
 
 
-# item 5 ----
-## retained catch in numbers and biomass (by stat area for directed fishery)
 
 
+### Item 5
+Raw fish ticket report by statistical area for the most recent directed snow crab fishery.
+
+```{r}
 fish_tick %>%
   # add fishery description, filter for sow crab directed fishery
   f_sdr(., col = "fishery", type = "fishery_code") %>%
@@ -163,5 +178,6 @@ fish_tick %>%
   dplyr::select(-cpue, -avg_wt, -price_lbs) %>%
   # save output
   write_csv(here("snow_crab/output/2019_20", "item5_snow_crab_fish_ticket_stat_area.csv"))
+```
 
 

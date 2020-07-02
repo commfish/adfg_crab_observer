@@ -1,0 +1,12 @@
+spcode,common_name,maturity,sex,alpha,beta
+921,red_king_crab,male,1,0.000403,3.141334
+921,red_king_crab,mature,2,0.003593,2.666076
+921,red_king_crab,immature,2,0.000408,3.127956
+931,tanner_crab,male,1,0.00027,3.022134
+931,tanner_crab,mature,2,0.000441,2.898686
+931,tanner_crab,immature,2,0.000562,2.816928
+932,snow_crab,male,1,0.000267,3.097253
+932,snow_crab,mature,2,0.001158,2.708793
+932,snow_crab,immature,2,0.001047,2.708367
+922,blue_king_crab,male,1,0.000502,3.107158
+922,blue_king_crab,mature,2,0.02065,2.27

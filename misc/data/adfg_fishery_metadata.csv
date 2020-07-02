@@ -1,0 +1,451 @@
+fishery_code,opening_year,fishery_name,target,management_area
+CK98,1998,cdq pribilof red and blue king crab,red and blue king crab,cdq
+CO00,2000,bering sea cdq opilio,snow crab,cdq
+CO01,2001,bering sea opilio cdq,snow crab,cdq
+CO02,2002,bering sea snow crab cdq,snow crab,cdq
+CO03,2003,bering sea cdq snow crab,snow crab,cdq
+CO04,2004,bering sea snow crab cdq,snow crab,cdq
+CO05,2005,bering sea snow crab cdq,snow crab,cdq
+CO98,1998,cdq bering sea opilio fishery,snow crab,cdq
+CO99,1999,cdq bering sea opilio,snow crab,cdq
+CP98,1998,cdq st mathew fishery,blue king crab,cdq
+CR00,2000,cdq bristol bay red king crab,red king crab,cdq
+CR01,2001,bristol bay red king crab cdq,red king crab,cdq
+CR02,2002,bristol bay red king crab cdq,red king crab,cdq
+CR03,2003,bristol bay red king crab cdq,red king crab,cdq
+CR04,2004,bristol bay red king crab cdq,red king crab,cdq
+CR98,1998,cdq bristol bay red king crab,red king crab,cdq
+CR99,1999,cdq bristol bay red king,red king crab,cdq
+DG95,1995,yakutat tanneri crab fishery,grooverd Tanner crab,yakutat
+EI88,1988,eastern bering sea bairdi crab,tanner crab ,bering sea
+EI90,1990,bering sea bairdi crab,tanner crab ,bering sea
+EI91,1991,bering sea bairdi crab,tanner crab ,bering sea
+EI92,1992,bering sea bairdi crab,tanner crab ,bering sea
+EO88,1988,eastern bering sea opilio crab,snow crab,bering sea
+EO89,1989,eastern bering sea opilio crab,snow crab,bering sea
+EO90,1990,eastern bering sea opilio crab,snow crab,bering sea
+EO91,1991,bering sea opilio crab,snow crab,bering sea
+EO92,1992,bering sea opilio crab,snow crab,bering sea
+EO93,1993,eastern bering sea opilio crab,snow crab,bering sea
+KG94,1994,kodiak tanneri,grooverd Tanner crab,kodiak
+MG00,2000,south peninsula tanneri,grooverd Tanner crab,alaksa peninsula
+MG04,2004,alaska peninsula grooved tanner crab,grooverd Tanner crab,alaksa peninsula
+MG17,2017,southern peninsula tanneri,grooverd Tanner crab,alaksa peninsula
+MG94,1994,south peninsula tanneri,grooverd Tanner crab,alaksa peninsula
+MG95,1995,south peninsula tanneri,grooverd Tanner crab,alaksa peninsula
+MG96,1996,alaska peninsula tanneri,grooverd Tanner crab,alaksa peninsula
+OA95,1995,dutch harbor angulatus fishery,triange Tanner crab,dutch_ai
+OA96,1996,dutch harbor angulatus,triange Tanner crab,dutch_ai
+OB00,2000,aleutian islands golden king crab,golden king crab,dutch_ai
+OB01,2001,aleutian islands golden king crab,golden king crab,dutch_ai
+OB02,2002,aleutian islands golden king crab,golden king crab,dutch_ai
+OB03,2003,aleutian islands golden king crab,golden king crab,dutch_ai
+OB04,2004,aleutian islands golden king crab,golden king crab,dutch_ai
+OB05,2005,aleutian islands golden king crab,golden king crab,dutch_ai
+OB06,2006,aleutian islands golden king crab,golden king crab,dutch_ai
+OB07,2007,aleutian islands golden king crab,golden king crab,dutch_ai
+OB08,2008,aleutian islands golden king crab,golden king crab,dutch_ai
+OB09,2009,eastern aleutian islands golden king crab,golden king crab,dutch_ai
+OB10,2010,eastern aleutian islands golden king crab,golden king crab,dutch_ai
+OB11,2011,eastern aleutian islands golden king crab,golden king crab,dutch_ai
+OB12,2012,eastern aleutian islands golden king crab,golden king crab,dutch_ai
+OB13,2013,eastern aleutian islands golden king crab,golden king crab,dutch_ai
+OB14,2014,eastern aleutian islands golden king crab,golden king crab,dutch_ai
+OB15,2015,eastern aleutian islands golden king crab,golden king crab,dutch_ai
+OB16,2016,eastern aleutian islands golden king crab,golden king crab,dutch_ai
+OB17,2017,eastern aleutian islands golden king crab,golden king crab,dutch_ai
+OB18,2018,eastern aleutian islands golden king crab,golden king crab,dutch_ai
+OB19,2019,eastern aleutian islands golden king crab,golden king crab,dutch_ai
+OB81,1981,eastern aleutian islands golden king crab,golden king crab,dutch_ai
+OB82,1982,eastern aleutian islands golden king crab,golden king crab,dutch_ai
+OB83,1983,eastern aleutian islands golden king crab,golden king crab,dutch_ai
+OB84,1984,eastern aleutian islands golden king crab,golden king crab,dutch_ai
+OB85,1985,eastern aleutian islands golden king crab,golden king crab,dutch_ai
+OB87,1987,eastern aleutian islands golden king crab,golden king crab,dutch_ai
+OB88,1988,dutch harbor brown king 1988/1989,golden king crab,dutch_ai
+OB89,1989,dutch harbor brown king crab 1989/1990,golden king crab,dutch_ai
+OB90,1990,dutch harbor brown king crab 1990/1991,golden king crab,dutch_ai
+OB91,1991,dutch harbor brown king crab 1991/1992,golden king crab,dutch_ai
+OB92,1992,dutch harbor brown king crab 1992/1993,golden king crab,dutch_ai
+OB93,1993,dutch harbor brown king crab 1993/1994,golden king crab,dutch_ai
+OB94,1994,dutch harbor king crab 1994/1995,golden king crab,dutch_ai
+OB95,1995,aleutian islands golden king crab,golden king crab,dutch_ai
+OB96,1996,aleutian islands golden king crab,golden king crab,dutch_ai
+OB97,1997,aleutian islands golden king crab,golden king crab,dutch_ai
+OB98,1998,aleutian islands golden king crab,golden king crab,dutch_ai
+OB99,1999,aleutian islands golden king crab,golden king crab,dutch_ai
+OC94,1994,,scarlet king crab,dutch_ai
+OC97,1997,,scarlet king crab,dutch_ai
+OG01,2001,eastern bering sea tanneri,grooverd Tanner crab,dutch_ai
+OG93,1993,,grooverd Tanner crab,dutch_ai
+OG94,1994,dutch harbor tanneri,grooverd Tanner crab,dutch_ai
+OG95,1995,dutch harbor tanneri,grooverd Tanner crab,dutch_ai
+OG96,1996,dutch harbor tanneri,grooverd Tanner crab,dutch_ai
+OH98,1998,,hair crab,dutch_ai
+OK80,1980,,red and blue king crab,dutch_ai
+OR00,2000,petrel bank red king crab,red king crab,dutch_ai
+OR01,2001,petrel banks red king crab survey,red king crab,dutch_ai
+OR02,2002,petrel bank red king crab,red king crab,dutch_ai
+OR03,2003,petrel bank red king crab,red king crab,dutch_ai
+OR62,1962,petrel bank red king crab,red king crab,dutch_ai
+OR65,1965,petrel bank red king crab,red king crab,dutch_ai
+OR70,1970,petrel bank red king crab,red king crab,dutch_ai
+OR72,1972,petrel bank red king crab,red king crab,dutch_ai
+OR73,1973,petrel bank red king crab,red king crab,dutch_ai
+OR74,1974,petrel bank red king crab,red king crab,dutch_ai
+OR75,1975,petrel bank red king crab,red king crab,dutch_ai
+OR76,1976,petrel bank red king crab,red king crab,dutch_ai
+OR77,1977,petrel bank red king crab,red king crab,dutch_ai
+OR78,1978,petrel bank red king crab,red king crab,dutch_ai
+OR80,1980,petrel bank red king crab,red king crab,dutch_ai
+OR81,1981,petrel bank red king crab,red king crab,dutch_ai
+OR82,1982,petrel bank red king crab,red king crab,dutch_ai
+OT03,2003,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT04,2004,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT05,2005,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT06,2006,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT07,2007,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT08,2008,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT09,2009,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT10,2010,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT11,2011,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT12,2012,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT13,2013,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT15,2015,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT16,2016,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT18,2018,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT79,1979,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT80,1980,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT81,1981,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT82,1982,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT83,1983,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT84,1984,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT85,1985,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT86,1986,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT87,1987,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT88,1988,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT89,1989,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT90,1990,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT91,1991,dutch harbor tanner crab,Tanner crab,dutch_ai
+OT94,1994,dutch harbor tanner crab,Tanner crab,dutch_ai
+OU95,1995,dutch harbor octopus fishery,giant pacific octopus,dutch_ai
+QA96,1996,,triange Tanner crab,bering sea
+QB01,2001,bering sea brown king crab,golden king crab,bering sea
+QB02,2002,bering sea golden king crab,golden king crab,bering sea
+QB03,2003,bering sea golden king crab,golden king crab,bering sea
+QB04,2004,bering sea golden king crab,golden king crab,bering sea
+QB05,2005,bering sea golden king crab,golden king crab,bering sea
+QB10,2010,bering sea golden king crab,golden king crab,bering sea
+QB11,2011,bering sea golden king crab,golden king crab,bering sea
+QB12,2012,bering sea golden king crab,golden king crab,bering sea
+QB13,2013,pribilof islands golden king crab,golden king crab,bering sea
+QB14,2014,pribilof islands golden king crab,golden king crab,bering sea
+QB17,2017,pribilof islands golden king crab,golden king crab,bering sea
+QB18,2018,pribilof islands golden king crab,golden king crab,bering sea
+QB19,2019,pribilof islands golden king crab,golden king crab,bering sea
+QB82,1982,pribilof islands golden king crab,golden king crab,bering sea
+QB83,1983,pribilof islands golden king crab,golden king crab,bering sea
+QB87,1987,pribilof islands golden king crab,golden king crab,bering sea
+QB88,1988,pribilof islands golden king crab,golden king crab,bering sea
+QB92,1992,bering sea brown king crab,golden king crab,bering sea
+QB94,1994,pribilof islands golden king crab,golden king crab,bering sea
+QG00,2000,bering sea tanneri,grooverd Tanner crab,bering sea
+QG01,2001,bering sea grooved tanner crab,grooverd Tanner crab,bering sea
+QG03,2003,bering sea grooved tanner crab,grooverd Tanner crab,bering sea
+QG04,2004,bering sea grooved tanner crab,grooverd Tanner crab,bering sea
+QG05,2005,bering sea grooved tanner crab,grooverd Tanner crab,bering sea
+QG17,2017,bering sea tanneri,grooverd Tanner crab,bering sea
+QG92,1992,bering sea grooved tanner crab,grooverd Tanner crab,bering sea
+QG93,1993,bering sea grooved tanner crab,grooverd Tanner crab,bering sea
+QG94,1994,bering sea tanneri crab,grooverd Tanner crab,bering sea
+QG95,1995,bering sea tanneri,grooverd Tanner crab,bering sea
+QG96,1996,bering sea tanneri,grooverd Tanner crab,bering sea
+QH00,2000,"bering sea hair crab, northern dist.",hair crab,bering sea
+QH83,1983,bering sea korean hair crab,hair crab,bering sea
+QH92,1992,bering sea korean hair crab,hair crab,bering sea
+QH93,1993,bering sea korean hair crab,hair crab,bering sea
+QH94,1994,bering sea korean hair crab,hair crab,bering sea
+QH95,1995,bering sea korean hair crab,hair crab,bering sea
+QH96,1996,"bering sea hair crab, 1996",hair crab,bering sea
+QH97,1997,korean hair crab,hair crab,bering sea
+QH98,1998,bering sea hair crab,hair crab,bering sea
+QH99,1999,bering sea korean hair crab,hair crab,bering sea
+QN93,1993,bering sea snails,snails,bering sea
+QN97,1997,"permit fishery, bering sea snails",snails,bering sea
+QO00,2000,bering sea snow crab,snow crab,bering sea
+QO01,2001,bering sea snow crab,snow crab,bering sea
+QO02,2002,bering sea snow crab,snow crab,bering sea
+QO03,2003,bering sea snow crab,snow crab,bering sea
+QO04,2004,bering sea snow crab,snow crab,bering sea
+QO05,2005,bering sea snow crab,snow crab,bering sea
+QO06,2006,bering sea snow crab,snow crab,bering sea
+QO07,2007,bering sea snow crab,snow crab,bering sea
+QO08,2008,bering sea snow crab,snow crab,bering sea
+QO09,2009,bering sea snow crab,snow crab,bering sea
+QO10,2010,bering sea snow crab,snow crab,bering sea
+QO11,2011,bering sea snow crab,snow crab,bering sea
+QO12,2012,bering sea snow crab,snow crab,bering sea
+QO13,2013,bering sea snow crab,snow crab,bering sea
+QO14,2014,bering sea snow crab,snow crab,bering sea
+QO15,2015,bering sea snow crab,snow crab,bering sea
+QO16,2016,bering sea snow crab,snow crab,bering sea
+QO17,2017,bering sea snow crab,snow crab,bering sea
+QO18,2018,bering sea snow crab,snow crab,bering sea
+QO74,1974,bering sea snow crab,snow crab,bering sea
+QO75,1975,bering sea snow crab,snow crab,bering sea
+QO76,1976,bering sea snow crab,snow crab,bering sea
+QO77,1977,bering sea snow crab,snow crab,bering sea
+QO78,1978,bering sea snow crab,snow crab,bering sea
+QO79,1979,bering sea snow crab,snow crab,bering sea
+QO80,1980,bering sea snow crab,snow crab,bering sea
+QO81,1981,bering sea snow crab,snow crab,bering sea
+QO82,1982,bering sea snow crab,snow crab,bering sea
+QO83,1983,bering sea snow crab,snow crab,bering sea
+QO84,1984,bering sea snow crab,snow crab,bering sea
+QO85,1985,bering sea snow crab,snow crab,bering sea
+QO86,1986,bering sea snow crab,snow crab,bering sea
+QO87,1987,bering sea snow crab,snow crab,bering sea
+QO93,1993,bering sea snow crab,snow crab,bering sea
+QO94,1994,bering sea opilio,snow crab,bering sea
+QO95,1995,bering sea snow crab,snow crab,bering sea
+QO96,1996,bering sea snow crab,snow crab,bering sea
+QO97,1997,bering sea snow crab,snow crab,bering sea
+QO98,1998,bering sea snow crab,snow crab,bering sea
+QO99,1999,bering sea snow crab,snow crab,bering sea
+QP09,2009,st. matthew blue king crab,blue king crab,bering sea
+QP10,2010,st. matthew blue king crab,blue king crab,bering sea
+QP11,2011,st. matthew blue king crab,blue king crab,bering sea
+QP12,2012,st. matthew blue king crab,blue king crab,bering sea
+QP14,2014,st. matthew blue king crab,blue king crab,bering sea
+QP15,2015,st. matthew blue king crab,blue king crab,bering sea
+QP77,1977,st. matthew blue king crab,blue king crab,bering sea
+QP78,1978,st. matthew blue king crab,blue king crab,bering sea
+QP79,1979,st. matthew blue king crab,blue king crab,bering sea
+QP80,1980,st. matthew blue king crab,blue king crab,bering sea
+QP82,1982,st. matthew blue king crab,blue king crab,bering sea
+QP83,1983,st. matthew blue king crab,blue king crab,bering sea
+QP84,1984,st. matthew blue king crab,blue king crab,bering sea
+QP85,1985,st. matthew blue king crab,blue king crab,bering sea
+QP86,1986,st. matthew blue king crab,blue king crab,bering sea
+QP87,1987,st. matthew blue king crab,blue king crab,bering sea
+QP88,1988,st. matthew blue king crab,blue king crab,bering sea
+QP89,1989,st. matthew blue king crab,blue king crab,bering sea
+QP90,1990,st. matthew blue king crab,blue king crab,bering sea
+QP91,1991,st. matthew blue king crab,blue king crab,bering sea
+QP92,1992,st. matthew blue king crab,blue king crab,bering sea
+QP93,1993,st. matthew blue king crab,blue king crab,bering sea
+QP94,1994,st. matthew blue king crab,blue king crab,bering sea
+QP95,1995,st. matthew blue king crab,blue king crab,bering sea
+QP96,1996,st. matthew/pribs,blue king crab,bering sea
+QP97,1997,st. matthew/pribs,blue king crab,bering sea
+QP98,1998,st matthew/pribs,blue king crab,bering sea
+QR78,1978,pribilof islands king crab,red king crab,bering sea
+QR81,1981,pribilof islands king crab,red king crab,bering sea
+QR82,1982,pribilof islands king crab,red king crab,bering sea
+QR83,1983,pribilof islands king crab,red king crab,bering sea
+QR84,1984,pribilof islands king crab,red king crab,bering sea
+QR85,1985,pribilof islands king crab,red king crab,bering sea
+QR86,1986,pribilof islands king crab,red king crab,bering sea
+QR93,1993,pribilof red king crab,red king crab,bering sea
+QR94,1994,pribilof red king crab,red king crab,bering sea
+QR95,1995,pribilof blue and red king crab,red and blue king crab,bering sea
+QR96,1996,pribilof islands king crab,red king crab,bering sea
+QR97,1997,pribilof red and blue king crab,red and blue king crab,bering sea
+QR98,1998,pribilof islands king crab,red king crab,bering sea
+QT05,2005,western bering sea tanner crab,Tanner crab,bering sea
+QT06,2006,western bering sea tanner crab,Tanner crab,bering sea
+QT07,2007,western bering sea tanner crab,Tanner crab,bering sea
+QT08,2008,western bering sea tanner crab,Tanner crab,bering sea
+QT13,2013,western bering sea tanner crab,Tanner crab,bering sea
+QT14,2014,western bering sea tanner crab,Tanner crab,bering sea
+QT15,2015,western bering sea tanner crab,Tanner crab,bering sea
+QT17,2017,western bering sea tanner crab,Tanner crab,bering sea
+QT18,2018,western bering sea tanner crab,Tanner crab,bering sea
+QT75,1975,bering sea bairdi,tanner crab ,bering sea
+QT81,1981,bering sea bairdi,tanner crab ,bering sea
+QT82,1982,bering sea bairdi,tanner crab ,bering sea
+QT83,1983,bering sea bairdi,tanner crab ,bering sea
+QT84,1984,bering sea bairdi,tanner crab ,bering sea
+QT85,1985,bering sea bairdi,tanner crab ,bering sea
+QT88,1988,bering sea bairdi,tanner crab ,bering sea
+QT89,1989,bering sea bairdi,tanner crab ,bering sea
+QT93,1993,bering sea bairdi,tanner crab ,bering sea
+QT94,1994,bering sea bairdi,tanner crab ,bering sea
+QT95,1995,bering sea tanner crab,Tanner crab,bering sea
+QT96,1996,bering sea tanner crab (b.s. west of 163w),Tanner crab,bering sea
+RB09,2009,western aleutian islands golden king crab,golden king crab,western aluetian islands
+RB10,2010,western aleutian islands golden king crab,golden king crab,western aluetian islands
+RB11,2011,western aleutian islands golden king crab,golden king crab,western aluetian islands
+RB12,2012,western aleutian islands golden king crab,golden king crab,western aluetian islands
+RB13,2013,western aleutian islands golden king crab,golden king crab,western aluetian islands
+RB14,2014,western aleutian islands golden king crab,golden king crab,western aluetian islands
+RB15,2015,western aleutian islands golden king crab,golden king crab,western aluetian islands
+RB16,2016,western aleutian islands golden king crab,golden king crab,western aluetian islands
+RB17,2017,western aleutian islands golden king crab,golden king crab,western aluetian islands
+RB18,2018,western aleutian islands golden king crab,golden king crab,western aluetian islands
+RB19,2019,western aleutian islands golden king crab,golden king crab,western aluetian islands
+RB77,1977,,golden king crab,western aluetian islands
+RB79,1979,,golden king crab,western aluetian islands
+RB80,1980,,golden king crab,western aluetian islands
+RB81,1981,,golden king crab,western aluetian islands
+RB82,1982,,golden king crab,western aluetian islands
+RB83,1983,,golden king crab,western aluetian islands
+RB84,1984,,golden king crab,western aluetian islands
+RB85,1985,western aleutian islands golden king crab,golden king crab,western aluetian islands
+RB86,1986,,golden king crab,western aluetian islands
+RB87,1987,,golden king crab,western aluetian islands
+RB88,1988,"adak brown, red and bairdi crab",golden and red king crab and tanner crab,western aluetian islands
+RB89,1989,adak brown red and bairdi crab,golden and red king crab and tanner crab,western aluetian islands
+RB90,1990,"adak brown, red and bairdi crab",golden and red king crab and tanner crab,western aluetian islands
+RB91,1991,"adak brown, red and bairdi crab",golden and red king crab and tanner crab,western aluetian islands
+RB92,1992,"adak brown, red and bairdi crab",golden and red king crab and tanner crab,western aluetian islands
+RB93,1993,adak brown king & bairdi,golden and red king crab and tanner crab,western aluetian islands
+RB94,1994,adak brown king crab,golden king crab,western aluetian islands
+RB95,1995,adak brown king crab,golden king crab,western aluetian islands
+RC93,1993,adak red king crab,red king crab,western aluetian islands
+RC94,1994,adak red king crab,red king crab,western aluetian islands
+RC95,1995,adak red king crab,red king crab,western aluetian islands
+RC96,1996,adak red king crab,red king crab,western aluetian islands
+RG95,1995,adak tanneri,grooverd Tanner crab,western aluetian islands
+RG96,1996,adak tanneri,grooverd Tanner crab,western aluetian islands
+RH96,1996,adak hair crab,hair crab,western aluetian islands
+RK93,1993,adak hair crab (directed fishery),red and blue king crab,western aluetian islands
+RR02,2002,adak red king crab survey,red king crab,western aluetian islands
+RR09,2009,petrel banks red king crab test fishery,red king crab,western aluetian islands
+RR61,1961,,red king crab,western aluetian islands
+RR62,1962,adak red king crab,red king crab,western aluetian islands
+RR64,1964,,red king crab,western aluetian islands
+RR65,1965,,red king crab,western aluetian islands
+RR72,1972,,red king crab,western aluetian islands
+RR73,1973,adak red king crab,red king crab,western aluetian islands
+RR74,1974,,red king crab,western aluetian islands
+RR75,1975,,red king crab,western aluetian islands
+RR77,1977,,red king crab,western aluetian islands
+RR78,1978,,red king crab,western aluetian islands
+RR79,1979,,red king crab,western aluetian islands
+RR80,1980,adak red king crab,red king crab,western aluetian islands
+RR81,1981,adak red king crab,red king crab,western aluetian islands
+RR82,1982,adak red king crab,red king crab,western aluetian islands
+RR83,1983,,red king crab,western aluetian islands
+RR84,1984,,red king crab,western aluetian islands
+RR85,1985,,red king crab,western aluetian islands
+RR86,1986,,red king crab,western aluetian islands
+RR87,1987,,red king crab,western aluetian islands
+RR88,1988,adak red king crab,red king crab,western aluetian islands
+RR89,1989,adak red king crab,red king crab,western aluetian islands
+RR90,1990,adak red king crab,red king crab,western aluetian islands
+RR91,1991,adak red king crab,red king crab,western aluetian islands
+RR92,1992,adak red king crab,red king crab,western aluetian islands
+RR93,1993,adak red king crab,red king crab,western aluetian islands
+RR94,1994,adak red king crab,red king crab,western aluetian islands
+RR95,1995,adak red king crab,red king crab,western aluetian islands
+RT80,1980,,Tanner crab,western aluetian islands
+RT81,1981,,Tanner crab,western aluetian islands
+RT82,1982,,Tanner crab,western aluetian islands
+RT83,1983,,Tanner crab,western aluetian islands
+RT84,1984,,Tanner crab,western aluetian islands
+RT85,1985,,Tanner crab,western aluetian islands
+RT86,1986,,Tanner crab,western aluetian islands
+RT87,1987,,Tanner crab,western aluetian islands
+RT88,1988,,Tanner crab,western aluetian islands
+RT89,1989,,Tanner crab,western aluetian islands
+RT90,1990,,Tanner crab,western aluetian islands
+RT91,1991,,Tanner crab,western aluetian islands
+TB02,2002,bristol bay golden king crab,golden king crab,bristol bay
+TB04,2004,bristol bay golden king crab,golden king crab,bristol bay
+TD04,2004,north peninsula dungeness,dungeness crab,bristol bay
+TD05,2005,north peninsula dungeness,dungeness crab,bristol bay
+TD07,2007,north peninsula dungeness,dungeness crab,bristol bay
+TD09,2009,north peninsula dungeness,dungeness crab,bristol bay
+TD10,2010,north peninsula dungeness,dungeness crab,bristol bay
+TD11,2011,north peninsula dungeness,dungeness crab,bristol bay
+TD12,2012,north peninsula dungeness,dungeness crab,bristol bay
+TD14,2014,north peninsula dungeness,dungeness crab,bristol bay
+TD15,2015,north peninsula dungeness,dungeness crab,bristol bay
+TD16,2016,north peninsula dungeness,dungeness crab,bristol bay
+TD17,2017,north peninsula dungeness crab,dungeness crab,bristol bay
+TF99,1999,bristol bay red king crab test fishery,red king crab,bristol bay
+TH93,1993,,hair crab,bristol bay
+TP81,1981,,blue king crab,bristol bay
+TR00,2000,bristol bay red king crab,red king crab,bristol bay
+TR01,2001,bristol bay red king crab,red king crab,bristol bay
+TR02,2002,bristol bay red king crab,red king crab,bristol bay
+TR03,2003,bristol bay red king crab,red king crab,bristol bay
+TR04,2004,bristol bay red king crab,red king crab,bristol bay
+TR05,2005,bristol bay red king crab,red king crab,bristol bay
+TR06,2006,bristol bay red king crab,red king crab,bristol bay
+TR07,2007,bristol bay red king crab,red king crab,bristol bay
+TR08,2008,bristol bay red king crab,red king crab,bristol bay
+TR09,2009,bristol bay red king crab,red king crab,bristol bay
+TR10,2010,bristol bay red king crab,red king crab,bristol bay
+TR11,2011,bristol bay red king crab,red king crab,bristol bay
+TR12,2012,bristol bay red king crab,red king crab,bristol bay
+TR13,2013,bristol bay red king crab,red king crab,bristol bay
+TR14,2014,bristol bay red king crab,red king crab,bristol bay
+TR15,2015,bristol bay red king crab,red king crab,bristol bay
+TR16,2016,bristol bay red king crab,red king crab,bristol bay
+TR17,2017,bristol bay red king crab,red king crab,bristol bay
+TR18,2018,bristol bay red king crab,red king crab,bristol bay
+TR19,2019,bristol bay red king crab,red king crab,bristol bay
+TR80,1980,bristol bay red king crab,red king crab,bristol bay
+TR81,1981,bristol bay red king crab,red king crab,bristol bay
+TR82,1982,bristol bay red king crab,red king crab,bristol bay
+TR84,1984,bristol bay red king crab,red king crab,bristol bay
+TR85,1985,bristol bay red king crab,red king crab,bristol bay
+TR86,1986,bristol bay red king crab,red king crab,bristol bay
+TR87,1987,bristol bay red king crab,red king crab,bristol bay
+TR88,1988,bristol bay red king crab,red king crab,bristol bay
+TR89,1989,bristol bay red king crab,red king crab,bristol bay
+TR90,1990,bristol bay red king crab,red king crab,bristol bay
+TR91,1991,bristol bay red king crab,red king crab,bristol bay
+TR92,1992,bristol bay red king crab,red king crab,bristol bay
+TR93,1993,bristol bay red king crab,red king crab,bristol bay
+TR96,1996,bristol bay red king crab,red king crab,bristol bay
+TR97,1997,bristol bay red king crab,red king crab,bristol bay
+TR98,1998,bristol bay red king crab,red king crab,bristol bay
+TR99,1999,bristol bay red king crab,red king crab,bristol bay
+TT06,2006,eastern bering sea tanner crab,Tanner crab,bristol bay
+TT07,2007,eastern bering sea tanner crab,Tanner crab,bristol bay
+TT08,2008,eastern bering sea tanner crab,Tanner crab,bristol bay
+TT09,2009,eastern bering sea tanner crab,Tanner crab,bristol bay
+TT13,2013,eastern bering sea tanner crab,Tanner crab,bristol bay
+TT14,2014,eastern bering sea tanner crab,Tanner crab,bristol bay
+TT15,2015,eastern bering sea tanner crab,Tanner crab,bristol bay
+XB01,2001,red king crab sampling during ob01,red king crab,cost recovery
+XB02,2002,red king crab sampling during ob02,red king crab,cost recovery
+XB04,2004,red king crab sampling during ob04,red king crab,cost recovery
+XB05,2005,red king crab sampling during ob05,red king crab,cost recovery
+XB06,2006,red king crab sampling during ob06,red king crab,cost recovery
+XB07,2007,red king crab sampling during ob07,red king crab,cost recovery
+XB08,2008,red king crab sampling during ob08,red king crab,cost recovery
+XB09,2009,red king crab sampling during ob09,red king crab,cost recovery
+XB10,2010,red king crab sampling during ob10,red king crab,cost recovery
+XB11,2011,red king crab sampling during rb11,red king crab,cost recovery
+XB12,2012,red king crab sampling during ob/rb12,red king crab,cost recovery
+XB13,2013,red king crab sampling during ob/rb13,red king crab,cost recovery
+XB14,2014,red king crab sampling during ob/rb14,red king crab,cost recovery
+XB15,2015,red king crab sampling during ob/rb15,red king crab,cost recovery
+XB16,2016,red king crab sampling during ob16/rb16,red king crab,cost recovery
+XB17,2017,red king crab sampling during ob/rb17,red king crab,cost recovery
+XE13,2013,eastern aleutians golden king crab cost recovery,golden king crab,cost recovery
+XE14,2014,eastern aleutians golden king crab cost recovery,golden king crab,cost recovery
+XE15,2015,eastern aleutians golden king crab cost recovery,golden king crab,cost recovery
+XE16,2016,eastern aleutians golden king crab cost recovery,golden king crab,cost recovery
+XE17,2017,eastern aleutians golden king crab cost recovery,golden king crab,cost recovery
+XE18,2018,eastern aleutians golden king crab cost recovery,golden king crab,cost recovery
+XE19,2019,eastern aleutians golden king crab cost recovery,golden king crab,cost recovery
+XO00,2000,,snow crab,cost recovery
+XR06,2006,bristol bay red king crab cost recovery,red king crab,cost recovery
+XR07,2007,bristol bay red king crab cost recovery,red king crab,cost recovery
+XR09,2009,bristol bay red king crab cost recovery,red king crab,cost recovery
+XR10,2010,bristol bay red king crab cost recovery,red king crab,cost recovery
+XR11,2011,bristol bay red king crab cost recovery,red king crab,cost recovery
+XR12,2012,bristol bay red king crab cost recovery,red king crab,cost recovery
+XR13,2013,bristol bay red king crab cost recovery,red king crab,cost recovery
+XR14,2014,bristol bay red king crab cost recovery,red king crab,cost recovery
+XR15,2015,bristol bay red king crab cost recovery,red king crab,cost recovery
+XR16,2016,bristol bay red king crab cost recovery,red king crab,cost recovery
+XR17,2017,bristol bay red king crab cost recovery,red king crab,cost recovery
+XR18,2018,bristol bay red king crab cost recovery,red king crab,cost recovery
+XR19,2019,bristol bay red king crab cost recovery,red king crab,cost recovery
+QO19,2019,bering sea snow crab,snow crab,bering sea
