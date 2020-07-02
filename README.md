@@ -25,4 +25,11 @@ Fish ticket data summarises retained catch and total known effort (directed and 
 5. **item5_snow_crab_fish_ticket_stat_area** - Fish ticket data for the directed snow crab fishery summarised by statstical area.
 
 ### Tanner crab
+1. **item1_directed_effort** - directed effort in Bering Sea snow crab, Bering Sea Tanner crab (W166, E166), and Bristol Bay red king crab fisheries from 1990 - present.
+2. **item2_tanner_crab_retained_catch** - Tanner crab retained catch in the Bering Sea snow crab, Bering Sea Tanner crab (W166, E166), and Bristol Bay red king crab fisheries from 1990 - present.
+3. **item3_tanner_crab_dockside_size_comp** - size composition of retained catch by shell condition in directed Tanner crab fisheries (W166, E166) from 2005 - present
+4. **item4** 
+5. **item5_tanner_crab_observer_size_comp** - size composition of catch by shell condition, sex, legal status as collected by at-sea observers during the Bering Sea snow crab, Bering Sea Tanner crab (W166, E166), and Bristol Bay red king crab fisheries from 2005 - present.
+6. **item6_observer_effort_summary** - summary of observer effort (i.e., sampled pots) in the Bering Sea snow crab, Bering Sea Tanner crab (W166, E166), and Bristol Bay red king crab fisheries from 2005 - present.
+
 
