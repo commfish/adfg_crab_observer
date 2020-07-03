@@ -49,8 +49,8 @@ tibble(spcode = c(932, 931, 931),
 # f_sdr ----
 # custom function for 'uncoding' fishery, shell condition and legal status codes into readily understandable text 
 # argument: x   - data frame or tibble containing a code column
-#           col - name of column with fishery code. 
-#           type - data type (i.e., "fishery_code", "shell_condition", "legal_status", "sex" code).
+#           col - name of column with code. 
+#           type - data type (i.e., "fishery_code", "shell_condition", "legal", "sex" code).
 f_sdr <- function(x, col, type){
   
   colnames <- names(x)
@@ -96,7 +96,7 @@ f_sdr <- function(x, col, type){
       dplyr::select(1:grep(col, colnames), shell_text, (grep(col, colnames) + 1):length(colnames)) -> tmp
  
   }
-  if(type == "legal_status"){
+  if(type == "legal"){
     x %>%
       pull(grep(col, names(.))) %>%
       tibble(legal = .) %>%
@@ -152,7 +152,7 @@ f_legal_status <- function(x){
 
 # f_retained_size_comp ----
 # dockside sampling size composition by shell condition
-# argument: x - dockside smapling data for a fishery by species
+# argument: x - dockside sampling data for a species by fishery. 
 #           lump - T/F. If true, shell codnitions 0, 1, 2 & 9 are "new" and 3 - 5 are "old". Default = F.
 f_retained_size_comp <- function(x, lump = F) {
   if(lump == F) {
@@ -192,7 +192,7 @@ f_retained_size_comp <- function(x, lump = F) {
 # f_observer_size_comp ----
 # observer measure pot size composition by sex, shell condition, and/or legal status
 # args: x - raw observer measure data for a given species in each fishery it was encountered in
-#       by - numeric option, 1 - 2; 1: sex, 2: sex & shell condition, 3: sex, shell condition & legal status
+#       by - numeric option denoting which delimiting characteristics to use. 1: sex, 2: sex & shell condition, 3: sex, shell condition & legal status
 #       lump - T/F. If true, shell codnitions 0, 1, 2 & 9 are "new" and 3 - 5 are "old". No Default.
 #            
 f_observer_size_comp <- function(x, by, lump){
@@ -304,8 +304,7 @@ f_observer_size_comp <- function(x, by, lump){
 # encountered. Codes are left as is. Output is meant to be joined for data pipeline using codes.
 # If grouping by sex and shell condition, shell condition is ALWAYS lumped to new and old.
 # args: x - raw observer measure pot data for a given species in each fishery it was encountered in
-#       by - numeric option, 1: sex, 2: sex and shell condition, 3: sex, shell condition, and legal status, 
-#            4: sex and legal status
+#       by - numeric option denoting which delimiting characteristics to use. 1: sex, 2: sex and shell condition, 3: sex, shell condition, and legal status, 4: sex and legal status
 #       units - "kg" or "lbs". Default = "kg"
 f_average_wt <- function(x, by, units = "kg"){
   if(by == 1){
