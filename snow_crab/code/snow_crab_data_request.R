@@ -42,7 +42,7 @@ dock %>%
   # add a column for total
   mutate(total = rowSums(.[, which(names(.) %in% shell_levels)])) %>%
   # save output
-  write_csv(here("snow_crab/output/2019_20/", "item1_dockside_size_comp.csv"))
+  write_csv(here(paste0("snow_crab/output/", season), "item1_dockside_size_comp.csv"))
   
          
             
@@ -61,7 +61,7 @@ obs_meas %>%
   # add a column for total (using generalized code to account for any possible shell condition)
   mutate(total = rowSums(.[, which(names(.) %in% shell_levels)])) %>%
   # save output
-  write_csv(here("snow_crab/output/2019_20", "item2_snow_crab_observer_size_comp.csv"))
+  write_csv(here(paste0("snow_crab/output/", season), "item2_snow_crab_observer_size_comp.csv"))
   
   
   
@@ -82,7 +82,7 @@ fish_tick %>%
   filter(target == "snow_crab",
          opening_year == as.numeric(substring(season, 1, 4))) %>%
   # save output
-  write_csv(here("snow_crab/output/2019_20", "item3_snow_crab_retained_catch.csv"))
+  write_csv(here(paste0("snow_crab/output/", season), "item3_snow_crab_retained_catch.csv"))
 
 
 
@@ -145,7 +145,7 @@ pot_sum %>%
   replace_na(list(tot_catch_number = 0,
                   tot_catch_wt = 0)) %>%
   # save output
-  write_csv(., here("snow_crab/output/2019_20", "item4_total_catch.csv"))
+  write_csv(., here(paste0("snow_crab/output/", season), "item4_total_catch.csv"))
 
 
 
@@ -162,6 +162,6 @@ fish_tick %>%
   # remove cpue, avg_wt, and price fields
   dplyr::select(-cpue, -avg_wt, -price_lbs) %>%
   # save output
-  write_csv(here("snow_crab/output/2019_20", "item5_snow_crab_fish_ticket_stat_area.csv"))
+  write_csv(here(paste0("snow_crab/output/", season), "item5_snow_crab_fish_ticket_stat_area.csv"))
 
 
