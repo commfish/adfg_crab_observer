@@ -16,20 +16,21 @@ Available fishery data includes 1) onboard observer data, 2) dockside sampling o
 
 Fish ticket data summarises retained catch and total known effort (directed and indcidental). Fish ticket summaries are provided by statistical area for each directed fishery in the most recent season, and/or by trip including both directed and incidental effort and catch.
 
-## Data Products
-### Snow crab
-1. **item1_dockside_size_comp** - Size frequency by shell condition of retained catch.
-2. **item2_snow_crab_bycatch_size_comp** - Size frequency of snow crab caught in every BSAI crab fishery (including the directed snow crab fishery) by sex, shell condition, legal status (i.e., T/F; True = male, CW &geq; 78 mm), and fishery.
-3. **item3_snow_crab_retained_catch** - Total retained live catch and deadloss (from fish ticket data) for the directed snow crab fishery.
-4. **item4_total_bycatch** - Point estimates of total catch number and total catch weight (lbs) of snow crab by sex in each crab fishery in which snow crab were caught.
-5. **item5_snow_crab_fish_ticket_stat_area** - Fish ticket data for the directed snow crab fishery summarised by statstical area.
+## File structure
+Each BSAI crab stock has it's own subdirectory within the main repository. By cloning or downloading the repository, you'll have access to materials related to each stock (you may delete what you like, but it will be restored with each new pull). Raw data for each stock is stored within the stock's subdirectory, in a subdirectory labelled *data*. No data is provided online, instead contact Tyler Jackson (tyler.jackson@alaska.gov) for the most updated data files. Within the stock's subdirectory, you will also find a subdirectory labelled *code* which houses scripts to produce data summary products, and an example workflow markdown document which details the method and code used to create the desired data summaries. All data summary outputs are stored in a separate subdirectory labelled *output* containing an additional subdirectory for the season (example: 2019_20). File paths are sourced using the ```here``` package, so only the relative file structure must remain in tact.  
 
-### Tanner crab
-1. **item1_directed_effort** - directed effort in Bering Sea snow crab, Bering Sea Tanner crab (W166, E166), and Bristol Bay red king crab fisheries from 1990 - present.
-2. **item2_tanner_crab_retained_catch** - Tanner crab retained catch in the Bering Sea snow crab, Bering Sea Tanner crab (W166, E166), and Bristol Bay red king crab fisheries from 1990 - present.
-3. **item3_tanner_crab_dockside_size_comp** - size composition of retained catch by shell condition in directed Tanner crab fisheries (W166, E166) from 2005 - present
-4. **item4** 
-5. **item5_tanner_crab_observer_size_comp** - size composition of catch by shell condition, sex, legal status as collected by at-sea observers during the Bering Sea snow crab, Bering Sea Tanner crab (W166, E166), and Bristol Bay red king crab fisheries from 2005 - present.
-6. **item6_observer_effort_summary** - summary of observer effort (i.e., sampled pots) in the Bering Sea snow crab, Bering Sea Tanner crab (W166, E166), and Bristol Bay red king crab fisheries from 2005 - present.
+The *misc* subdirectory contains the subdirectories *code* and *data* which contain custom data manipulation functions and growth parameter estimates used for estimating animal weight, respectively. The *misc* subdirectory **must** be present within the main repository directory.  
+
+An example directory map is as follows:  
+* misc
+  - code
+  - data
+* snow_crab
+  - data
+  - code
+  - output
+    - 2019_20
+* tanner_crab
+* bbrkc
 
 
