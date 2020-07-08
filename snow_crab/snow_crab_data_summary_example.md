@@ -104,8 +104,9 @@ obs_meas %>%
 
 Sum the raw fish ticket report for the most recent directed fishery
 across all stat areas to get totals for number and weight (lbs) of live
-retained crab and deadloss, as well as total effort. Note: *totals at a
-delivery are expanded from brailer subsample weights and counts*.
+retained crab and deadloss, as well as total effort. Note: *total number
+of crab at a delivery are expanded from brailer subsample weights and
+counts*.
 
 ``` r
 fish_tick %>%
