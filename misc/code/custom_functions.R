@@ -39,9 +39,9 @@ tibble(code_3 = sprintf("%02d", 0:99),
 params <- read_csv(here("misc/data", "weight_parameters.csv"))
 
 # background data for f_legal_status ----
-tibble(spcode = c(932, 931, 931),
-       fishery_area = c(NA, "E166", "W166"),
-       legal_size_mm = c(78, 121, 111)) -> legal_size
+tibble(spcode = c(932, 931, 931, 921),
+       fishery_area = c(NA, "E166", "W166", NA),
+       legal_size_mm = c(78, 121, 111, 135)) -> legal_size
 
 
 
