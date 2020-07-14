@@ -223,7 +223,7 @@ obs_meas %>%
   # save output
   write_csv(here(paste0("bbrkc/output/", season), "item4b_legal_observer_size_comp_directed_fishery.csv"))
 
-## all legal males by shell condition
+## females by shell condition
 obs_meas %>%
   filter(sex == 2) %>%
   f_observer_size_comp(by = 2, lump = F) %>%
@@ -277,7 +277,7 @@ obs_meas %>%
   # save output
   write_csv(here(paste0("bbrkc/output/", season), "item6b_legal_observer_size_comp_tanner_e166_fishery.csv"))
 
-## all legal males by shell condition
+## females by shell condition
 obs_meas %>%
   filter(sex == 2) %>%
   f_observer_size_comp(by = 2, lump = F) %>%
