@@ -81,8 +81,8 @@ pot_sum %>%
 ### Item 1
 
 Sum the counts of landed crab (as collected by dockside samplers) by
-shell condition in 1 mm size bins for the most recent directed snow crab
-fishery.
+shell condition in 1 mm size bins for the previous season’s directed
+PIRKC crab fishery.
 
 ``` r
 dock %>%
