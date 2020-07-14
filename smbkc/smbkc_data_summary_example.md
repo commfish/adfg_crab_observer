@@ -36,6 +36,9 @@ following output:
     Carapace length (mm) composition of females by shell condition
     caught in observer measure pots in the Bering Sea snow crab fishery.
 
+When the SMBKC fishery is closed, or no BKC are caught as bycatch in
+other BSAI crab fisheries, output will be empty .csv files.
+
 ## Example Workflow
 
 ### Load libraries, global options, custom functions, and raw data
