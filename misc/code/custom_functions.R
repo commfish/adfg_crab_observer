@@ -9,6 +9,7 @@
 
 # dependencies ----
 library(tidyverse, quiet = T)
+library(lubridate)
 library(here)
 
 
@@ -36,7 +37,7 @@ tibble(code_3 = sprintf("%02d", 0:99),
                              as.numeric(code_3) + 2000, 
                              as.numeric(code_3) + 1900)) -> char_yr
 # background data for f_average_wt function ----
-params <- read_csv(here("misc/data", "weight_parameters.csv"))
+params <- read_csv(here::here("misc/data", "weight_parameters.csv"))
 
 # background data for f_legal_status ----
 tibble(spcode = c(932, 931, 931, 921),
@@ -395,4 +396,25 @@ f_average_wt <- function(x, by, units = "kg"){
   tmp
 }
 
+
+# f_sday ----
+# coerce sample date into day of season.
+# args: x - sample date in the format MM-/DD-/YYYY
+#       y - Julian date for start of season in a non-leap year. Default is October 15, 288.
+f_sday <- function(x, y = 288){
+  case_when((year(mdy(x)) %in% seq(0, 100000, 4) & yday(mdy(x)) > (y)) ~ yday(mdy(x)) - (y),
+            (year(mdy(x)) %in% seq(0, 100000, 4) & yday(mdy(x)) <= (y)) ~ yday(mdy(x)) + 366 - (y),
+            (!(year(mdy(x)) %in% seq(0, 100000, 4)) & yday(mdy(x)) > (y - 1)) ~ yday(mdy(x)) - (y - 1),
+            (!(year(mdy(x)) %in% seq(0, 100000, 4)) & yday(mdy(x)) <= (y - 1))  ~ yday(mdy(x)) + 365 - (y - 1))
+}
   
+# f_stat_week ----
+# assign ADF&G statistical week to date
+# args: x - sample date in the format MM-/DD-/YYYY
+f_stat_week <- function(x){
+  case_when(epiweek(mdy(paste0("1-1-", year(mdy(x))))) > 50 ~ ifelse(month(mdy(x)) == 1 & epiweek(mdy(x)) > 50, 1, epiweek(mdy(x)) + 1),
+            epiweek(mdy(paste0("1-1-", year(mdy(x))))) == 1 ~ epiweek(mdy(x)))
+  
+}
+
+

@@ -202,3 +202,71 @@ f_average_wt(x = obs_meas, by = 4, units = "lbs")
     ## 1 QO19        1 FALSE         0.355
     ## 2 QO19        1 TRUE          0.888
     ## 3 QO19        2 FALSE         0.197
+
+### Day of Season `f_sday`
+
+This function coerces sample date in the format “MMDDYYYY” separated by
+“-” or “/” (ex: “7/23/2020”, “7-23-2020”) into date of the BSAI
+commercial fishing season. By default, the first day of the season is
+October 15th, but season start date can be any day of the year.
+
+Arguments:
+
+  - **x** - sample date in the format MM-/DD-/YYYY.
+  - **y** - Julian date for start of season in a non-leap year. Default
+    is October 15, y = 288.
+
+Usage: Example using observer measure pot data
+
+``` r
+obs_meas %>%
+  dplyr::select(fishery, sampdate) %>%
+  mutate(season_day = f_sday(sampdate))
+```
+
+    ## # A tibble: 337,603 x 3
+    ##    fishery sampdate   season_day
+    ##    <chr>   <chr>           <dbl>
+    ##  1 QO19    01-04-2020         82
+    ##  2 QO19    01-04-2020         82
+    ##  3 QO19    01-04-2020         82
+    ##  4 QO19    01-04-2020         82
+    ##  5 QO19    01-04-2020         82
+    ##  6 QO19    01-04-2020         82
+    ##  7 QO19    01-04-2020         82
+    ##  8 QO19    01-04-2020         82
+    ##  9 QO19    01-04-2020         82
+    ## 10 QO19    01-04-2020         82
+    ## # ... with 337,593 more rows
+
+### Stat Week`f_stat_week`
+
+This function assigns ADF\&G stat week to sample date in the format
+“MMDDYYYY” separated by “-” or “/” (ex: “7/23/2020”, “7-23-2020”).
+
+Arguments:
+
+  - **x** - sample date in the format MM-/DD-/YYYY.
+
+Usage: Example using observer measure pot data
+
+``` r
+obs_meas %>%
+  dplyr::select(fishery, sampdate) %>%
+  mutate(stat_week = f_stat_week(sampdate))
+```
+
+    ## # A tibble: 337,603 x 3
+    ##    fishery sampdate   stat_week
+    ##    <chr>   <chr>          <dbl>
+    ##  1 QO19    01-04-2020         1
+    ##  2 QO19    01-04-2020         1
+    ##  3 QO19    01-04-2020         1
+    ##  4 QO19    01-04-2020         1
+    ##  5 QO19    01-04-2020         1
+    ##  6 QO19    01-04-2020         1
+    ##  7 QO19    01-04-2020         1
+    ##  8 QO19    01-04-2020         1
+    ##  9 QO19    01-04-2020         1
+    ## 10 QO19    01-04-2020         1
+    ## # ... with 337,593 more rows
