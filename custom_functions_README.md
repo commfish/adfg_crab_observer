@@ -239,7 +239,7 @@ obs_meas %>%
     ## 10 QO19    01-04-2020         82
     ## # ... with 337,593 more rows
 
-### Stat Week`f_stat_week`
+### Stat Week `f_stat_week`
 
 This function assigns ADF\&G stat week to sample date in the format
 “MMDDYYYY” separated by “-” or “/” (ex: “7/23/2020”, “7-23-2020”).
