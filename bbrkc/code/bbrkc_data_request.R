@@ -83,7 +83,7 @@ pot_sum %>%
   group_by(fishery) %>%
   summarise(obs_effort = n()) -> measured_effort
 
-## get directe effort in the bbrkc fishery
+## get directed effort in the bbrkc fishery
 fish_tick %>%
   # combine XR and TR fisheries
   mutate(fishery = gsub("XR", "TR", fishery)) %>%
@@ -108,40 +108,26 @@ pot_sum %>%
   # compute total catch
   group_by(fishery, group) %>%
   summarise(total_catch_num = (count / obs_effort) * effort) -> total_catch_num
-  
-## comput total catch weight (lbs) with measure pot data
+
+## extrapolate to weight using observer measure pot and average wt data
 obs_meas %>%
-  # remove crab without a legal code
-  filter(!is.na(legal)) %>%
-  # decipher legal could into legal group
-  f_sdr(col = "legal", type = "legal") %>%
-  mutate(group = ifelse(grepl("legal_", legal_text), "tot_legal", legal_text)) %>%
-  # add maturity based on clutch
-  mutate(maturity = case_when(sex == 1 ~ "male",
-                              (sex == 2 & clutch == 0) ~ "immature",
-                               (sex == 2 & clutch != 0) ~ "mature")) %>%
-  # count by fishery, sex, group, size, maturity
-  count(fishery, spcode, sex, group, maturity, size) %>%
-  # join to length-weight parameters
-  left_join(read_csv(here("misc/data", "weight_parameters.csv")),
-            by = c("spcode", "sex", "maturity")) %>%
-  # compute weight (lbs) in by line combination
-  mutate(wt_lbs = (alpha * size^beta) * 0.0022046226218 * n) %>%
-  # join to measure pot effort and fishery directed effort
-  left_join(measured_effort, by = "fishery") %>%
-  left_join(directed_effort, by = "fishery") %>%
-  # compute total catch weight by fishery and group
-  mutate(total_weight = (wt_lbs / obs_effort) * effort) %>%
-  group_by(fishery, group) %>%
-  summarise(total_catch_lbs = sum(total_weight, na.rm = T)) %>%
-  # join to total catch number
+  f_average_wt(by = 4, units = "lbs") %>%
+  # use sex and legal status to assign group
+  mutate(group = case_when(sex == 2 & legal_status == F~ "female",
+                           sex == 1 & legal_status == F ~ "sublegal",
+                           sex == 1 & legal_status == T ~ "tot_legal")) %>%
+  dplyr::select(fishery, group, avg_wt) %>%
+  # join to total catch number and extrapolate
   left_join(total_catch_num, by = c("fishery", "group")) %>%
+  mutate(total_catch_lbs = total_catch_num * avg_wt) %>%
   # decipher fishery code, filter for most recent directed fishery
   f_sdr(col = "fishery", type = "fishery_code") %>%
   filter(substring(fishery, 1, 2) == "TR",
          opening_year == as.numeric(substring(season, 1, 4))) %>%
+  # remove avg_wt and sex column
+  ungroup() %>%
+  dplyr::select(-avg_wt, -sex) %>%
   write_csv(here(paste0("bbrkc/output/", season), "item1_total_catch_directed_fishery.csv"))
-
   
 # item 2 ----
 ## number and weight of rkc caught in the directed tanner crab E166
@@ -167,7 +153,7 @@ pot_sum %>%
   pivot_longer(c(female, male), names_to = "sex_text", values_to = "count") %>%
   mutate(sex = ifelse(sex_text == "male", 1, 2)) %>%
   # join to average weight by fishery and sex
-  left_join(f_average_wt(obs_meas, by = 1), by = c("fishery", "sex")) %>%
+  left_join(f_average_wt(obs_meas, by = 1, units = "lbs"), by = c("fishery", "sex")) %>%
   # compute total catch number and weight (lbs)
   mutate(total_catch_num = (count / obs_effort) * directed_effort,
          total_catch_lbs = total_catch_num * avg_wt) %>%
