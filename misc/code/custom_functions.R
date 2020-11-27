@@ -293,13 +293,6 @@ f_observer_size_comp <- function(x, by, lump){
 }
 
 
-
-
-
-
-
-
-
 # f_average_wt ----
 # get average weight by a crab (by sex and maturity status) in each fishery in which it was 
 # encountered. Codes are left as is. Output is meant to be joined for data pipeline using codes.
@@ -308,17 +301,30 @@ f_observer_size_comp <- function(x, by, lump){
 #       by - numeric option denoting which delimiting characteristics to use. 1: sex, 2: sex and shell condition, 3: sex, shell condition, and legal status, 4: sex and legal status
 #       units - "kg" or "lbs". Default = "kg"
 f_average_wt <- function(x, by, units = "kg"){
+
+  ## add maturity group text column
+  ### RKC, BKC, GKC
+  if(unique(x$spcode) %in% 921:923){
+    x %>%
+    mutate(maturity = case_when(sex == 1 ~ "male",
+                                sex == 2 & size >= 90 ~ "mature", 
+                                sex == 2 & size < 90 ~ "immature")) -> x
+  } 
+  ### snow and tanner crab
+  if(unique(x$spcode) %in% 931:932){
+    x %>%
+      mutate(maturity = case_when(sex == 1 ~ "male",
+                                  sex == 2 & maturity == 1 ~ "mature", 
+                                  sex == 2 & maturity == 0 ~ "immature")) -> x
+  }
+  
   if(by == 1){
     x %>%
-      # remove females that are missing clutch information
-      filter(!(sex == 2 & is.na(clutch)),
-             !(sex == 2 & clutch < 0)) %>%
-      dplyr::select(fishery, sex, spcode, size, shell, clutch) %>%
-      count(fishery, sex, spcode, size, clutch) %>%
+      # remove females that are maturity information
+      filter(!(sex == 2 & is.na(maturity))) %>%
+      dplyr::select(fishery, sex, spcode, size, shell, maturity) %>%
+      count(fishery, sex, spcode, size, maturity) %>%
       rename(count = n) %>%
-      mutate(maturity = case_when(sex == 1 ~ "male",
-                                  sex == 2 & clutch > 0 ~ "mature", 
-                                  sex == 2 & clutch == 0 ~ "immature")) %>%
       # join to growth parameters
       left_join(params, by = c("sex", "spcode", "maturity")) %>%
       # estimate calculated weight
@@ -328,19 +334,15 @@ f_average_wt <- function(x, by, units = "kg"){
   }
   if(by == 2){
     x %>%
-      # remove females that are missing clutch information
-      filter(!(sex == 2 & is.na(clutch)),
-             !(sex == 2 & clutch < 0),
+      # remove females that are missing maturity information and all individuals missing shell height information
+      filter(!(sex == 2 & is.na(maturity)),
              !is.na(shell),
              shell != -9) %>%
       mutate(shell_lump = case_when(shell %in% c(0:2, 9) ~ 2,
                                     shell %in% c(3:5) ~ 3)) %>%
-      dplyr::select(fishery, sex, spcode, size, shell_lump, clutch) %>%
-      count(fishery, sex, spcode, size, shell_lump, clutch) %>%
+      dplyr::select(fishery, sex, spcode, size, shell_lump, maturity) %>%
+      count(fishery, sex, spcode, size, shell_lump, maturity) %>%
       rename(count = n) %>%
-      mutate(maturity = case_when(sex == 1 ~ "male",
-                                  sex == 2 & clutch > 0 ~ "mature", 
-                                  sex == 2 & clutch == 0 ~ "immature")) %>%
       # join to growth parameters
       left_join(params, by = c("sex", "spcode", "maturity")) %>%
       # estimate calculated weight
@@ -350,20 +352,16 @@ f_average_wt <- function(x, by, units = "kg"){
   }
   if(by == 3){
     x %>%
-      # remove females that are missing clutch information
-      filter(!(sex == 2 & is.na(clutch)),
-             !(sex == 2 & clutch < 0),
+      # remove females that are missing maturity information and all individuals missing shell height information
+      filter(!(sex == 2 & is.na(maturity)),
              !is.na(shell),
              shell != -9) %>%
       mutate(shell_lump = case_when(shell %in% c(0:2, 9) ~ 2,
                                     shell %in% c(3:5) ~ 3)) %>%
-      dplyr::select(fishery, sex, spcode, size, shell_lump, clutch) %>%
+      dplyr::select(fishery, sex, spcode, size, shell_lump, maturity) %>%
       f_legal_status() %>%
-      count(fishery, sex, spcode, size, shell_lump, clutch, legal_status) %>%
+      count(fishery, sex, spcode, size, shell_lump, maturity, legal_status) %>%
       rename(count = n) %>%
-      mutate(maturity = case_when(sex == 1 ~ "male",
-                                  sex == 2 & clutch > 0 ~ "mature", 
-                                  sex == 2 & clutch == 0 ~ "immature")) %>%
       # join to growth parameters
       left_join(params, by = c("sex", "spcode", "maturity")) %>%
       # estimate calculated weight
@@ -373,16 +371,12 @@ f_average_wt <- function(x, by, units = "kg"){
   }
   if(by == 4){
     x %>%
-      # remove females that are missing clutch information
-      filter(!(sex == 2 & is.na(clutch)),
-             !(sex == 2 & clutch < 0)) %>%
-      dplyr::select(fishery, sex, spcode, size, clutch) %>%
+      # remove females that are maturity information
+      filter(!(sex == 2 & is.na(maturity))) %>%
+      dplyr::select(fishery, sex, spcode, size, maturity) %>%
       f_legal_status() %>%
-      count(fishery, sex, spcode, size, clutch, legal_status) %>%
+      count(fishery, sex, spcode, size, maturity, legal_status) %>%
       rename(count = n) %>%
-      mutate(maturity = case_when(sex == 1 ~ "male",
-                                  sex == 2 & clutch > 0 ~ "mature", 
-                                  sex == 2 & clutch == 0 ~ "immature")) %>%
       # join to growth parameters
       left_join(params, by = c("sex", "spcode", "maturity")) %>%
       # estimate calculated weight
