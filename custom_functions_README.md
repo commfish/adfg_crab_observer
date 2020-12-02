@@ -40,7 +40,7 @@ Usage: Example using fishery code for dockside sampling data
 f_sdr(x = dock, col = "fishery", type = "fishery_code")
 ```
 
-    ## # A tibble: 11,219 x 11
+    ## # A tibble: 11,218 x 11
     ##    fishery management_area target opening_year  adfg sampdate   spcode  size
     ##    <chr>   <chr>           <chr>         <dbl> <dbl> <date>      <dbl> <dbl>
     ##  1 QO19    bering_sea      snow_~         2019     7 2020-02-09    932    92
@@ -53,7 +53,7 @@ f_sdr(x = dock, col = "fishery", type = "fishery_code")
     ##  8 QO19    bering_sea      snow_~         2019     7 2020-02-09    932   103
     ##  9 QO19    bering_sea      snow_~         2019     7 2020-02-09    932   104
     ## 10 QO19    bering_sea      snow_~         2019     7 2020-02-09    932   105
-    ## # ... with 11,209 more rows, and 3 more variables: legal <dbl>, shell <dbl>,
+    ## # ... with 11,208 more rows, and 3 more variables: legal <dbl>, shell <dbl>,
     ## #   numcrab <dbl>
 
 ### Legal Status `f_legal_status()`
@@ -111,7 +111,9 @@ Usage: Example using dockside sampling data
 f_retained_size_comp(x = dock, lump = T) 
 ```
 
-    ## # A tibble: 69 x 7
+    ## `summarise()` regrouping output by 'fishery', 'size' (override with `.groups` argument)
+
+    ## # A tibble: 68 x 7
     ##    fishery management_area target    opening_year  size   new   old
     ##    <chr>   <chr>           <chr>            <dbl> <dbl> <dbl> <dbl>
     ##  1 QO19    bering_sea      snow_crab         2019    72     0     1
@@ -124,7 +126,7 @@ f_retained_size_comp(x = dock, lump = T)
     ##  8 QO19    bering_sea      snow_crab         2019    83     0     2
     ##  9 QO19    bering_sea      snow_crab         2019    84     3     1
     ## 10 QO19    bering_sea      snow_crab         2019    85     4     0
-    ## # ... with 59 more rows
+    ## # ... with 58 more rows
 
 ### Observer Sampling Size Composition `f_observer_size_comp`
 
@@ -187,21 +189,25 @@ Arguments:
   - **by** - numeric option denoting which delimiting characteristics to
     use. 1: sex, 2: sex and shell condition, 3: sex, shell condition,
     and legal status, 4: sex and legal status.
+  - **legal\_code** - Logical. If TRUE, legal designations are based on
+    observer stick measures (1 / 0) instead of size, species, and
+    location (Tanner crab). Default = T.
   - **units** - “kg” or “lbs”. Default = “kg”.
 
 Usage: Example using observer measure pot data
 
 ``` r
-f_average_wt(x = obs_meas, by = 4, units = "lbs")
+f_average_wt(x = obs_meas, by = 4, legal_code = T, units = "lbs")
 ```
 
-    ## # A tibble: 3 x 4
-    ## # Groups:   fishery, sex [2]
+    ## `summarise()` regrouping output by 'fishery', 'sex' (override with `.groups` argument)
+
+    ## # A tibble: 2 x 4
+    ## # Groups:   fishery, sex [1]
     ##   fishery   sex legal_status avg_wt
-    ##   <chr>   <dbl> <lgl>         <dbl>
-    ## 1 QO19        1 FALSE         0.355
-    ## 2 QO19        1 TRUE          0.888
-    ## 3 QO19        2 FALSE         0.197
+    ##   <chr>   <dbl>        <dbl>  <dbl>
+    ## 1 QO19        1            0  0.367
+    ## 2 QO19        1            1  0.892
 
 ### Day of Season `f_sday`
 

@@ -299,8 +299,9 @@ f_observer_size_comp <- function(x, by, lump){
 # If grouping by sex and shell condition, shell condition is ALWAYS lumped to new and old.
 # args: x - raw observer measure pot data for a given species in each fishery it was encountered in
 #       by - numeric option denoting which delimiting characteristics to use. 1: sex, 2: sex and shell condition, 3: sex, shell condition, and legal status, 4: sex and legal status
+#       legal_code - Logical. If TRUE, legal designations are based on observer stick measures (1 / 0) instead of size, species, and location (Tanner crab)
 #       units - "kg" or "lbs". Default = "kg"
-f_average_wt <- function(x, by, units = "kg"){
+f_average_wt <- function(x, by, legal_code = T, units = "kg"){
 
   ## add maturity group text column
   ### RKC, BKC, GKC
@@ -351,38 +352,88 @@ f_average_wt <- function(x, by, units = "kg"){
       summarise(avg_wt = weighted.mean(calc_wt_kg, w = count)) -> tmp
   }
   if(by == 3){
-    x %>%
-      # remove females that are missing maturity information and all individuals missing shell height information
-      filter(!(sex == 2 & is.na(maturity)),
-             !is.na(shell),
-             shell != -9) %>%
-      mutate(shell_lump = case_when(shell %in% c(0:2, 9) ~ 2,
-                                    shell %in% c(3:5) ~ 3)) %>%
-      dplyr::select(fishery, sex, spcode, size, shell_lump, maturity) %>%
-      f_legal_status() %>%
-      count(fishery, sex, spcode, size, shell_lump, maturity, legal_status) %>%
-      rename(count = n) %>%
-      # join to growth parameters
-      left_join(params, by = c("sex", "spcode", "maturity")) %>%
-      # estimate calculated weight
-      mutate(calc_wt_kg = (alpha * as.numeric(size)^beta) / 1000) %>%
-      group_by(fishery, sex, shell_lump, legal_status) %>%
-      summarise(avg_wt = weighted.mean(calc_wt_kg, w = count)) -> tmp
+    if(legal_code == T){
+      x %>%
+        # remove females that are missing maturity information and all individuals missing shell height information
+        filter(!(sex == 2 & is.na(maturity)),
+               !is.na(shell),
+               shell != -9,
+               !is.na(legal)) %>%
+        # fix legal designation
+        mutate(legal_status = case_when(legal %in% c(0, -7) ~ 0,
+                                      legal %in% 1:6 ~ 1),
+               legal_status = ifelse(legal_status == -9, NA, legal_status),
+               shell_lump = case_when(shell %in% c(0:2, 9) ~ 2,
+                                      shell %in% c(3:5) ~ 3)) %>%
+        filter(!is.na(legal_status)) %>%
+        count(fishery, sex, spcode, size, shell_lump, maturity, legal_status) %>%
+        rename(count = n) %>%
+        # join to growth parameters
+        left_join(params, by = c("sex", "spcode", "maturity")) %>%
+        # estimate calculated weight
+        mutate(calc_wt_kg = (alpha * as.numeric(size)^beta) / 1000) %>%
+        group_by(fishery, sex, shell_lump, legal_status) %>%
+        summarise(avg_wt = weighted.mean(calc_wt_kg, w = count)) %>%
+        mutate(legal_status = legal_status == 1) -> tmp
+    }
+    if(legal_code == F){
+      x %>%
+        # remove females that are missing maturity information and all individuals missing shell height information
+        filter(!(sex == 2 & is.na(maturity)),
+               !is.na(shell),
+               shell != -9) %>%
+        mutate(shell_lump = case_when(shell %in% c(0:2, 9) ~ 2,
+                                      shell %in% c(3:5) ~ 3)) %>%
+        dplyr::select(fishery, sex, spcode, size, shell_lump, maturity) %>%
+        f_legal_status() %>%
+        count(fishery, sex, spcode, size, shell_lump, maturity, legal_status) %>%
+        rename(count = n) %>%
+        # join to growth parameters
+        left_join(params, by = c("sex", "spcode", "maturity")) %>%
+        # estimate calculated weight
+        mutate(calc_wt_kg = (alpha * as.numeric(size)^beta) / 1000) %>%
+        group_by(fishery, sex, shell_lump, legal_status) %>%
+        summarise(avg_wt = weighted.mean(calc_wt_kg, w = count)) -> tmp
+    }
   }
+  
   if(by == 4){
-    x %>%
-      # remove females that are maturity information
-      filter(!(sex == 2 & is.na(maturity))) %>%
-      dplyr::select(fishery, sex, spcode, size, maturity) %>%
-      f_legal_status() %>%
-      count(fishery, sex, spcode, size, maturity, legal_status) %>%
-      rename(count = n) %>%
-      # join to growth parameters
-      left_join(params, by = c("sex", "spcode", "maturity")) %>%
-      # estimate calculated weight
-      mutate(calc_wt_kg = (alpha * as.numeric(size)^beta) / 1000) %>%
-      group_by(fishery, sex, legal_status) %>%
-      summarise(avg_wt = weighted.mean(calc_wt_kg, w = count)) -> tmp
+    if(legal_code == T){
+      x %>%
+        # remove females that are missing maturity information and all individuals missing shell height information
+        filter(!(sex == 2 & is.na(maturity)),
+               !is.na(shell),
+               shell != -9,
+               !is.na(legal)) %>%
+        # fix legal designation
+        mutate(legal_status = case_when(legal %in% c(0, -7) ~ 0,
+                                        legal %in% 1:6 ~ 1),
+               legal_status = ifelse(legal_status == -9, NA, legal_status),) %>%
+        filter(!is.na(legal_status)) %>%
+        count(fishery, sex, spcode, size, maturity, legal_status) %>%
+        rename(count = n) %>%
+        # join to growth parameters
+        left_join(params, by = c("sex", "spcode", "maturity")) %>%
+        # estimate calculated weight
+        mutate(calc_wt_kg = (alpha * as.numeric(size)^beta) / 1000) %>%
+        group_by(fishery, sex, legal_status) %>%
+        summarise(avg_wt = weighted.mean(calc_wt_kg, w = count)) -> tmp
+    }
+    if(legal_code == F){
+      x %>%
+        # remove females that are maturity information
+        filter(!(sex == 2 & is.na(maturity))) %>%
+        dplyr::select(fishery, sex, spcode, size, maturity) %>%
+        f_legal_status() %>%
+        count(fishery, sex, spcode, size, maturity, legal_status) %>%
+        rename(count = n) %>%
+        # join to growth parameters
+        left_join(params, by = c("sex", "spcode", "maturity")) %>%
+        # estimate calculated weight
+        mutate(calc_wt_kg = (alpha * as.numeric(size)^beta) / 1000) %>%
+        group_by(fishery, sex, legal_status) %>%
+        summarise(avg_wt = weighted.mean(calc_wt_kg, w = count)) -> tmp
+    }
   }
   if(units == "lbs"){
     tmp$avg_wt <- tmp$avg_wt * 2.2046226218
