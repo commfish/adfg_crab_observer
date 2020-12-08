@@ -402,8 +402,6 @@ f_average_wt <- function(x, by, legal_code = T, units = "kg"){
       x %>%
         # remove females that are missing maturity information and all individuals missing shell height information
         filter(!(sex == 2 & is.na(maturity)),
-               !is.na(shell),
-               shell != -9,
                !is.na(legal)) %>%
         # fix legal designation
         mutate(legal_status = case_when(legal %in% c(0, -7) ~ 0,

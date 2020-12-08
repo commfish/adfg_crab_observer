@@ -8,7 +8,7 @@
 ## custom functions and libraries
 source("./misc/code/custom_functions.R")
 
-## most recent season
+## most recent season (remove when timeseries is produced for all items)
 season <- "2019_20"
 
 # data inputs ----
@@ -23,7 +23,10 @@ obs_meas <- read_csv(here("bbrkc/data", "RKC-1990-2019_crab_dump.csv"))
 pot_sum <- read_csv(here("bbrkc/data", "RKC-1990-2019_potsum.csv"))
 
 ## fish ticket data by stat area
-fish_tick<- read_csv(here("bbrkc/data", "bsai_crab_fish_ticket_summary_stat_area.csv"))
+fish_tick <- read_csv(here("bbrkc/data", "bsai_crab_fish_ticket_summary_stat_area.csv"))
+
+## timerseries of directed effort
+dir_effort <- read_csv(here("bbrkc/data", "directed_effort_timeseries_DP.csv"))
 
 ## parameters for calculated weight estimation
 params <- read_csv(here("misc/data", "weight_parameters.csv"))
@@ -83,15 +86,9 @@ pot_sum %>%
   group_by(fishery) %>%
   summarise(obs_effort = n()) -> measured_effort
 
-## get directed effort in the bbrkc fishery
-fish_tick %>%
-  # combine XR and TR fisheries
-  mutate(fishery = gsub("XR", "TR", fishery)) %>%
-  group_by(fishery) %>%
-  summarise_all(sum, na.rm = T) %>%
-  ungroup() %>%
-  filter(substring(fishery, 1, 2) == "TR") %>%
-  dplyr::select(fishery, effort) -> directed_effort
+# get directed effort in the bbrkc fishery
+dir_effort %>%
+  filter(substring(fishery, 1, 2) == "TR") -> directed_effort
 
 ## get total catch by legal group in numbers
 pot_sum %>%
@@ -113,30 +110,28 @@ pot_sum %>%
 obs_meas %>%
   f_average_wt(by = 4, units = "lbs") %>%
   # use sex and legal status to assign group
-  mutate(group = case_when(sex == 2 & legal_status == F~ "female",
+  mutate(group = case_when(sex == 2 & legal_status == F ~ "female",
                            sex == 1 & legal_status == F ~ "sublegal",
                            sex == 1 & legal_status == T ~ "tot_legal")) %>%
   dplyr::select(fishery, group, avg_wt) %>%
   # join to total catch number and extrapolate
   left_join(total_catch_num, by = c("fishery", "group")) %>%
   mutate(total_catch_lbs = total_catch_num * avg_wt) %>%
-  # decipher fishery code, filter for most recent directed fishery
+  # decipher fishery code, filter for directed fishery
   f_sdr(col = "fishery", type = "fishery_code") %>%
-  filter(substring(fishery, 1, 2) == "TR",
-         opening_year == as.numeric(substring(season, 1, 4))) %>%
-  # remove avg_wt and sex column
+  filter(substring(fishery, 1, 2) == "TR") %>%
+  # remove avg_wt and sex column, and NA groups (sex == 3)
   ungroup() %>%
   dplyr::select(-avg_wt, -sex) %>%
+  filter(!is.na(group)) %>%
   write_csv(here(paste0("bbrkc/output/", season), "item1_total_catch_directed_fishery.csv"))
   
 # item 2 ----
 ## number and weight of rkc caught in the directed tanner crab E166
   
-## get direct effort in the bbrkc fishery
-fish_tick %>%
-  filter(substring(fishery, 1, 2) == "TT") %>%
-  dplyr::select(fishery, effort) %>%
-  rename(directed_effort = effort) -> directed_effort
+## get direct effort in the tanner e166 fishery
+dir_effort %>%
+  filter(substring(fishery, 1, 2) == "TT") -> directed_effort
 
 ## estimate total bycatch
 pot_sum %>%
@@ -148,26 +143,25 @@ pot_sum %>%
             male = sum(sublegal, tot_legal, na.rm = T),
             obs_effort = n()) %>%
   # join to observer effort
-  left_join(directed_effort, by = "fishery") %>%
+  right_join(directed_effort, by = "fishery") %>%
   # pivot to long format add sex code
   pivot_longer(c(female, male), names_to = "sex_text", values_to = "count") %>%
   mutate(sex = ifelse(sex_text == "male", 1, 2)) %>%
   # join to average weight by fishery and sex
   left_join(f_average_wt(obs_meas, by = 1, units = "lbs"), by = c("fishery", "sex")) %>%
   # compute total catch number and weight (lbs)
-  mutate(total_catch_num = (count / obs_effort) * directed_effort,
+  mutate(total_catch_num = (count / obs_effort) * effort,
          total_catch_lbs = total_catch_num * avg_wt) %>%
+  # replace missing estimates with zeros (closed fishery)
+  replace_na(list(total_catch_num = 0,
+                  total_catch_lbs = 0)) %>%
   # remove unneeded data
-  dplyr::select(-obs_effort, -directed_effort, -sex, -count, -avg_wt) %>%
-  # decipher fishery code and filter for past season
+  dplyr::select(-obs_effort, -effort, -sex, -count, -avg_wt) %>%
+  # decipher fishery code and filter for past season, arrange by season
   f_sdr(col = "fishery", type = "fishery_code") %>%
-  filter(opening_year == as.numeric(substring(season, 1, 4))) %>%
+  arrange(opening_year) %>%
   # save output
   write_csv(here(paste0("bbrkc/output/", season), "item2_total_catch_tanner_crab_e166.csv"))
-
-  
-
-
   
 
 # item 3 ----
