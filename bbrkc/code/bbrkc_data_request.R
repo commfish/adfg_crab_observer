@@ -2,7 +2,7 @@
 ## fishery data request - bbrkc
 ## prepared by: Tyler Jackson
 ## email: tyler.jackson@alaska.gov
-## last updated: 7/6/2020
+## last updated: 12/9/2020
 
 # load ----
 ## custom functions and libraries
@@ -47,25 +47,13 @@ dock %>%
 
 obs_meas %>%
   # combine bbrkc tf and directed fishery
-  mutate(fishery = gsub("XR", "TR", fishery)) %>%
-  # filter for only fisheries since rationalization
-  filter(as.numeric(substring(fishery, 3, 4)) >= 5,
-         as.numeric(substring(fishery, 3, 4)) < 80,
-         !(fishery %in% c("CO05", "QO05o"))) %>%
-  # remove 'r' in QO05 fishery code
-  mutate(fishery = gsub("r", "", fishery)) -> obs_meas
+  mutate(fishery = gsub("XR", "TR", fishery)) -> obs_meas
 
 pot_sum %>%
   # remove added column start_year
   dplyr::select(-start_year) %>%
   # combine bbrkc tf and directed fishery
-  mutate(fishery = gsub("XR", "TR", fishery)) %>%
-  # filter for only fisheries since rationalization
-  filter(as.numeric(substring(fishery, 3, 4)) >= 5,
-         as.numeric(substring(fishery, 3, 4)) < 80,
-         !(fishery %in% c("CO05", "QO05o"))) %>%
-  # remove 'r' in QO05 fishery code
-  mutate(fishery = gsub("r", "", fishery)) -> pot_sum
+  mutate(fishery = gsub("XR", "TR", fishery)) -> pot_sum
 
 ## summarise fish ticket data by fishery
 fish_tick %>%
@@ -120,10 +108,11 @@ obs_meas %>%
   # decipher fishery code, filter for directed fishery
   f_sdr(col = "fishery", type = "fishery_code") %>%
   filter(substring(fishery, 1, 2) == "TR") %>%
-  # remove avg_wt and sex column, and NA groups (sex == 3)
+  # remove avg_wt and sex column, and NA groups (sex == 3), arrange by fishery
   ungroup() %>%
   dplyr::select(-avg_wt, -sex) %>%
   filter(!is.na(group)) %>%
+  arrange(opening_year) %>%
   write_csv(here(paste0("bbrkc/output/", season), "item1_total_catch_directed_fishery.csv"))
   
 # item 2 ----
@@ -185,9 +174,8 @@ obs_meas %>%
   f_observer_size_comp(by = 2, lump = F) %>%
   # add a column for total
   mutate(total = rowSums(.[7:ncol(.)])) %>%
-  # filter for most recent directed fishery
-  filter(opening_year == as.numeric(substring(season, 1, 4)),
-         substring(fishery, 1, 2) == "TR") %>%
+  # filter for directed fishery
+  filter(substring(fishery, 1, 2) == "TR") %>%
   # save output
   write_csv(here(paste0("bbrkc/output/", season), "item4a_sublegal_observer_size_comp_directed_fishery.csv"))
 
@@ -197,9 +185,8 @@ obs_meas %>%
   f_observer_size_comp(by = 2, lump = F) %>%
   # add a column for total
   mutate(total = rowSums(.[7:ncol(.)])) %>%
-  # filter for most recent directed fishery
-  filter(opening_year == as.numeric(substring(season, 1, 4)),
-         substring(fishery, 1, 2) == "TR") %>%
+  # filter for directed fishery
+  filter(substring(fishery, 1, 2) == "TR") %>%
   # save output
   write_csv(here(paste0("bbrkc/output/", season), "item4b_legal_observer_size_comp_directed_fishery.csv"))
 
@@ -209,9 +196,8 @@ obs_meas %>%
   f_observer_size_comp(by = 2, lump = F) %>%
   # add a column for total
   mutate(total = rowSums(.[7:ncol(.)])) %>%
-  # filter for most recent directed fishery
-  filter(opening_year == as.numeric(substring(season, 1, 4)),
-         substring(fishery, 1, 2) == "TR") %>%
+  # filter for directed fishery
+  filter(substring(fishery, 1, 2) == "TR") %>%
   # save output
   write_csv(here(paste0("bbrkc/output/", season), "item4c_female_observer_size_comp_directed_fishery.csv"))
 
@@ -222,9 +208,8 @@ dock %>%
   f_retained_size_comp(lump = F) %>%
   # add a column for total
   mutate(total = rowSums(.[6:ncol(.)])) %>%
-  # filter for most recent directed fishery
-  filter(opening_year == as.numeric(substring(season, 1, 4)),
-         substring(fishery, 1, 2) == "TR") %>%
+  # filter for directed fishery
+  filter(substring(fishery, 1, 2) == "TR") %>%
   # save output
   write_csv(here(paste0("bbrkc/output/", season), "item5_retained_size_comp.csv"))
   
@@ -239,9 +224,8 @@ obs_meas %>%
   f_observer_size_comp(by = 2, lump = F) %>%
   # add a column for total
   mutate(total = rowSums(.[7:ncol(.)])) %>%
-  # filter for most recent directed fishery
-  filter(opening_year == as.numeric(substring(season, 1, 4)),
-         substring(fishery, 1, 2) == "TT") %>%
+  # filter for filter for tanner e166 fisheries
+  filter(substring(fishery, 1, 2) == "TT") %>%
   # save output
   write_csv(here(paste0("bbrkc/output/", season), "item6a_sublegal_observer_size_comp_tanner_e166_fishery.csv"))
 
@@ -251,9 +235,8 @@ obs_meas %>%
   f_observer_size_comp(by = 2, lump = F) %>%
   # add a column for total
   mutate(total = rowSums(.[7:ncol(.)])) %>%
-  # filter for most recent directed fishery
-  filter(opening_year == as.numeric(substring(season, 1, 4)),
-         substring(fishery, 1, 2) == "TT") %>%
+  # filter for filter for tanner e166 fisheries
+  filter(substring(fishery, 1, 2) == "TT") %>%
   # save output
   write_csv(here(paste0("bbrkc/output/", season), "item6b_legal_observer_size_comp_tanner_e166_fishery.csv"))
 
@@ -263,9 +246,8 @@ obs_meas %>%
   f_observer_size_comp(by = 2, lump = F) %>%
   # add a column for total
   mutate(total = rowSums(.[7:ncol(.)])) %>%
-  # filter for most recent directed fishery
-  filter(opening_year == as.numeric(substring(season, 1, 4)),
-         substring(fishery, 1, 2) == "TT") %>%
+  # filter for filter for tanner e166 fisheries
+  filter(substring(fishery, 1, 2) == "TT") %>%
   # save output
   write_csv(here(paste0("bbrkc/output/", season), "item6c_female_observer_size_comp_tanner_e166_fishery.csv"))
 
