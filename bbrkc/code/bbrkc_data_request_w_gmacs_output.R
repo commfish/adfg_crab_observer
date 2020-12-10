@@ -125,7 +125,7 @@ dir_catch_est %>%
   summarise(obs = sprintf('%.1f', sum(total_catch_t))) %>%
   # add columsn required by gmacs
   mutate(year = opening_year, 
-         seas = 3, 
+         season = 3, 
          fleet = 1, 
          sex = 1,
          cv = 0.04, 
@@ -135,8 +135,8 @@ dir_catch_est %>%
          effort = 0,
          discard_mortality = 0.2) %>%
   # re-order, comment out header, and save .txt file
-  dplyr::select(year, seas, fleet, sex, obs, cv, type, units, mult, effort, discard_mortality) %>%
-  rename(`#year` = opening_year) %>%
+  dplyr::select(year, season, fleet, sex, obs, cv, type, units, mult, effort, discard_mortality) %>%
+  rename(`#year` = year) %>%
   write_delim(here(paste0("bbrkc/output/", season), "item1a_total_catch_directed_fishery_males.txt"), delim = "\t")
 
 ## female discards (t) in directed fishery (gmacs format)
@@ -146,7 +146,7 @@ dir_catch_est %>%
   summarise(obs = sprintf('%.1f', sum(total_catch_t))) %>%
   # add columsn requiresd by gmacs
   mutate(year = opening_year,
-         seas = 3, 
+         season = 3, 
          fleet = 1, 
          sex = 2,
          cv = 0.07, 
@@ -156,8 +156,8 @@ dir_catch_est %>%
          effort = 0,
          discard_mortality = 0.2) %>%
   # re-order, comment out header, and save .txt file
-  dplyr::select(year, seas, fleet, sex, obs, cv, type, units, mult, effort, discard_mortality) %>%
-  rename(`#year` = opening_year) %>%
+  dplyr::select(year, season, fleet, sex, obs, cv, type, units, mult, effort, discard_mortality) %>%
+  rename(`#year` = year) %>%
   write_delim(here(paste0("bbrkc/output/", season), "item1b_total_catch_directed_fishery_females.txt"), delim = "\t")
   
 
@@ -203,7 +203,7 @@ crab_fishery_bycatch_est %>%
   filter(sex_text == "male") %>%
   mutate(obs = sprintf('%.3f', total_catch_t)) %>%
   mutate(year = opening_year, 
-         seas = 5, 
+         season = 5, 
          fleet = 3, 
          sex = 1,
          cv = 0.07, 
@@ -213,7 +213,7 @@ crab_fishery_bycatch_est %>%
          potlifts = effort / 1000,
          discard_mortality = 0.25) %>%
   # re-order and save .txt file
-  dplyr::select(year, seas, fleet, sex, obs, cv, type, units, mult, potlifts, discard_mortality) %>%
+  dplyr::select(year, season, fleet, sex, obs, cv, type, units, mult, potlifts, discard_mortality) %>%
   # add small modifier to avoid zero pot lifts
   # comment out years when the fishery is closed
   mutate(potlifts = ifelse(potlifts == 0, 0.0001, potlifts),
@@ -225,7 +225,7 @@ crab_fishery_bycatch_est %>%
   filter(sex_text == "male") %>%
   mutate(obs = sprintf('%.3f', total_catch_t)) %>%
   mutate(year = opening_year, 
-         seas = 5, 
+         season = 5, 
          fleet = 3, 
          sex = 2,
          cv = 0.07, 
@@ -235,7 +235,7 @@ crab_fishery_bycatch_est %>%
          potlifts = effort / 1000,
          discard_mortality = 0.25) %>%
   # re-order and save .txt file
-  dplyr::select(year, seas, fleet, sex, obs, cv, type, units, mult, potlifts, discard_mortality) %>%
+  dplyr::select(year, season, fleet, sex, obs, cv, type, units, mult, potlifts, discard_mortality) %>%
   # add small modifier to avoid zero pot lifts
   # comment out years when the fishery is closed
   mutate(potlifts = ifelse(potlifts == 0, 0.0001, potlifts),
