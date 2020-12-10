@@ -277,7 +277,7 @@ obs_meas %>%
   # pivot to wide format
   dplyr::select(-total) %>%
   pivot_wider(names_from = "size_bin", values_from = "prop") %>%
-  # addition data
+  # additional data
   mutate(year = opening_year,
          season = 3, 
          fleet = 1, 
@@ -310,7 +310,7 @@ obs_meas %>%
   # pivot to wide format
   dplyr::select(-total) %>%
   pivot_wider(names_from = "size_bin", values_from = "prop") %>%
-  # addition data
+  # additional data
   mutate(year = opening_year,
          season = 3, 
          fleet = 1, 
@@ -338,7 +338,7 @@ dock %>%
                         labels = paste0("cl", seq(67.5, 162.5, 5)))) %>%
   # filter for most recent directed fishery
   filter(substring(fishery, 1, 2) == "TR") %>%
-  # sum across size bins, normalize 0 - 1
+  # sum across size bins, normalize to 1
   group_by(opening_year, size_bin, .drop = F) %>%
   summarise(total = sum(total, na.rm = T)) %>%
   group_by(opening_year) %>%
@@ -347,7 +347,7 @@ dock %>%
   # pivot to wide format
   dplyr::select(-total) %>%
   pivot_wider(names_from = "size_bin", values_from = "prop") %>%
-  # addition data
+  # additional data
   mutate(year = opening_year,
          season = 3, 
          fleet = 1, 
@@ -388,7 +388,7 @@ obs_meas %>%
 # save male matrix
 tt_size_comp %>%
   filter(sex == "male") %>%
-  # addition data
+  # additional data
   mutate(year = opening_year,
          season = 5, 
          fleet = 1, 
@@ -408,7 +408,7 @@ tt_size_comp %>%
   mutate_at(18:22, as.numeric) %>%
   mutate(cl142.5 =  sprintf('%.4f', cl142.5 + cl147.5 + cl152.5 + cl157.5 + cl162.5)) %>%
   dplyr::select(-cl147.5, -cl152.5, -cl157.5, -cl162.5) %>%
-  # addition data
+  # additional data
   mutate(year = opening_year,
          season = 5, 
          fleet = 1, 
