@@ -11,6 +11,7 @@
 library(tidyverse, quiet = T)
 library(lubridate)
 library(here)
+library(readxl)
 
 
 # background data for shell condition ----
@@ -460,4 +461,61 @@ f_stat_week <- function(x){
   
 }
 
+# f_read_fish_tick_xlsx ----
+# read excel sheet fish ticket reports by stat_area provided by Dutch Harbor ADF&G
+# args: path - file path to excel document
 
+f_read_fish_tick_xlsx <- function(path, format = "new") {
+  
+  ## function to map across sheets for cleaning up data
+  f_ft_clean <- function(x) {
+    if(nrow(x) > 0){
+      row_num <- grep("Total", pull(x, 1))
+      x %>%
+        slice(-c(row_num:nrow(x))) %>%
+        mutate_all(as.character())
+    }
+  }
+  
+  if(format == "new"){
+    suppressWarnings( 
+      tibble(fishery = excel_sheets(path),
+             xl_list = lapply(excel_sheets(path), function(x) read_excel(path = path, sheet = x, skip = 2, col_types = "text"))) %>%
+        mutate(n_row = purrr::map_dbl(xl_list, nrow),
+               xl_list = purrr::map(xl_list, f_ft_clean)) %>%
+        # filter data for only single fisheries that have data (assuming 4 char is fishery code)
+        filter(nchar(fishery, type = "chars") == 4, 
+               n_row > 0) %>%
+        dplyr::select(-n_row) %>%
+        unnest(xl_list) %>%
+        # rename columns
+        rename_all(~c("fishery", "stat_area", "vessels", "landings", "live_number", "live_lbs", "deadloss_number", "deadloss_lbs", "effort", "cpue", "avg_wt", "price_lbs")) %>%
+        # fix column class
+        mutate_at(3:12, as.numeric)
+    ) -> tmp
+  }
+  
+  
+  if(format == "old"){
+    suppressWarnings( 
+    tibble(fishery = excel_sheets(path),
+           xl_list = lapply(excel_sheets(path), function(x) read_excel(path = path, sheet = x, skip = 11, col_types = "text"))) %>%
+      mutate(n_row = purrr::map_dbl(xl_list, nrow),
+             xl_list = purrr::map(xl_list, f_ft_clean)) %>%
+      # filter data for only single fisheries that have data (assuming 4 char is fishery code)
+      filter(nchar(fishery, type = "chars") == 4, 
+             n_row > 0) %>%
+      dplyr::select(-n_row) %>%
+      unnest(xl_list) %>%
+      # rename columns
+      rename_all(~c("fishery", "stat_area", "vessels", "landings", "live_number", "live_lbs", "deadloss_number", "deadloss_lbs", "effort", "cpue", "avg_wt", "price_lbs")) %>%
+      # remove blank rows
+      filter(!is.na(stat_area)) %>%
+      # fix column class
+      mutate_at(3:12, as.numeric)
+    ) -> tmp
+  }
+  tmp
+}
+
+  

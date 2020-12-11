@@ -207,7 +207,7 @@ f_average_wt(x = obs_meas, by = 4, legal_code = T, units = "lbs")
     ##   fishery   sex legal_status avg_wt
     ##   <chr>   <dbl>        <dbl>  <dbl>
     ## 1 QO19        1            0  0.367
-    ## 2 QO19        1            1  0.892
+    ## 2 QO19        1            1  0.891
 
 ### Day of Season `f_sday`
 
@@ -276,3 +276,46 @@ obs_meas %>%
     ##  9 QO19    01-04-2020         1
     ## 10 QO19    01-04-2020         1
     ## # ... with 337,593 more rows
+
+### Read Fish Ticket Report by Stat Area `f_read_fish_tick_xlsx`
+
+This function reads fish ticket reports by statistical area provided by
+ADF\&G Dutch Harbor staff in the format of multiple-sheet, Excel
+worksheets. Sheet names are assumed to be four letter fishery codes, all
+other sheets with names more than four characters are discarded. Rows
+representing grand totals are discarded, and only data pertaining to
+each statistical area is retained. Output is a single tibble containing
+11 columns of data (fishery, statistical area, number of vessels, number
+of landings, number and weight of live crab and deadloss, number of pot
+lifts, catch per unit effort, average weight, and price per pound).
+
+Arguments:
+
+  - **path** - file path to Excel worksheet.  
+  - **format** - fish tickets summaries prior to the 2014-15 season were
+    provided in a different format than later seasons. As such they must
+    be read differently. Possible values are “new” for summaries
+    produced from the 2014-15 season to present and “old” for summaries
+    produced prior.
+
+Usage: Example using 2019-20 fish ticket report by stat area
+
+``` r
+f_read_fish_tick_xlsx(path = "./misc/data/fish_ticket_summaries/2019-20_crab.xlsx", format = "new")
+```
+
+    ## # A tibble: 201 x 12
+    ##    fishery stat_area vessels landings live_number live_lbs deadloss_number
+    ##    <chr>   <chr>       <dbl>    <dbl>       <dbl>    <dbl>           <dbl>
+    ##  1 TR19    615601          1        2           0       0               NA
+    ##  2 TR19    615630          2        4         485    3428.              NA
+    ##  3 TR19    625600          6        8         448    3109.               1
+    ##  4 TR19    625630          6        9        2848   20780.               4
+    ##  5 TR19    635530          2        2           2      14               NA
+    ##  6 TR19    635600         40       81      128666  896970.             232
+    ##  7 TR19    635630         39       68       59707  421338.             155
+    ##  8 TR19    635700          1        1           0       0               NA
+    ##  9 TR19    645530          2        3          11      76               NA
+    ## 10 TR19    645600         50      100      173221 1254044.             525
+    ## # ... with 191 more rows, and 5 more variables: deadloss_lbs <dbl>,
+    ## #   effort <dbl>, cpue <dbl>, avg_wt <dbl>, price_lbs <dbl>

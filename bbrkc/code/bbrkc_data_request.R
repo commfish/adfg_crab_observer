@@ -23,7 +23,10 @@ obs_meas <- read_csv(here("bbrkc/data", "RKC-1990-2019_crab_dump.csv"))
 pot_sum <- read_csv(here("bbrkc/data", "RKC-1990-2019_potsum.csv"))
 
 ## fish ticket data by stat area
-fish_tick <- read_csv(here("bbrkc/data", "bsai_crab_fish_ticket_summary_stat_area.csv"))
+ft_files <- list.files(here("misc/data/fish_ticket_summaries"), full.names = T)
+c(lapply(grep(".xlsx", ft_files, value = T), f_read_fish_tick_xlsx),
+  lapply(ft_files[!grepl(".xlsx", ft_files)], f_read_fish_tick_xlsx, format = "old")) %>%
+  do.call("rbind", .) -> fish_tick
 
 ## timerseries of directed effort
 dir_effort <- read_csv(here("bbrkc/data", "directed_effort_timeseries_DP.csv"))
@@ -158,9 +161,8 @@ pot_sum %>%
 fish_tick %>%
   # filter for bbrkc directed and cost recovery fishery
   filter(substring(fishery, 1, 2) %in% c("TR", "XR")) %>%
-  # decihper fishery code and filter for most recent season
+  # decihper fishery code
   f_sdr(col = "fishery", type = "fishery_code") %>%
-  filter(opening_year == as.numeric(substring(season, 1, 4))) %>%
   # save output
   write_csv(here(paste0("bbrkc/output/", season), "item3_fish_ticket_summary.csv"))
 
