@@ -166,8 +166,10 @@ dir_effort %>%
 
 ## estimate total bycatch
 pot_sum %>%
-  # filter for direct E166 tanner crab fisheries
-  filter(substring(fishery, 1, 2) == "TT") %>%
+  # filter for directed E166 tanner crab fisheries
+  filter(substring(fishery, 1, 2) == "TT" | (substring(fishery, 1, 2) %in% c("EI", "QT") & statarea < 660000 & statarea > 0)) %>%
+  # change fishery codes to TT from EI and QT
+  mutate(fishery = gsub("EI|QT", "TT", fishery)) %>%
   # summarise number of crab caught by sex
   group_by(fishery) %>%
   summarise(female = sum(female, na.rm = T),
@@ -216,7 +218,7 @@ crab_fishery_bycatch_est %>%
 
 ## total female catch (t) in tanner crab fishery e166 (gmacs format)
 crab_fishery_bycatch_est %>%
-  filter(sex_text == "male") %>%
+  filter(sex_text == "female") %>%
   mutate(obs = sprintf('%.3f', total_catch_t)) %>%
   mutate(year = opening_year, 
          season = 5, 
@@ -360,7 +362,10 @@ dock %>%
 # item 6 ----
 ## observer size composition, by legal status and shell condition from tanner crab e166 fishery
 obs_meas %>%
-  filter(legal %in% c(-7, 0, 1, 2, 3, 6)) %>%
+  filter(legal %in% c(-7, 0, 1, 2, 3, 6),
+         substring(fishery, 1, 2) == "TT" | (substring(fishery, 1, 2) %in% c("EI", "QT") & statarea < 660000 & statarea > 0)) %>%
+  # change fishery codes to TT from EI and QT
+  mutate(fishery = gsub("EI|QT", "TT", fishery)) %>%
   f_observer_size_comp(by = 2, lump = F) %>%
   # add a column for total, size bin
   mutate(total = rowSums(.[7:ncol(.)]),
@@ -395,7 +400,7 @@ tt_size_comp %>%
   rbind(c("#year", "season", "fleet", "sex", "type", "shell", "maturity", "nsamp", "datavector", rep(NA, 19)), .) %>%
   write_delim(here(paste0("bbrkc/output/", season), "item6a_tanner_e166_size_comp_males.txt"), delim = "\t", col_names = F, na = "")
 
-# save male matrix
+# save female matrix
 tt_size_comp %>%
   filter(sex == "female") %>%
   # combine last five bins to one

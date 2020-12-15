@@ -121,8 +121,10 @@ dir_effort %>%
 
 ## estimate total bycatch
 pot_sum %>%
-  # filter for direct E166 tanner crab fisheries
-  filter(substring(fishery, 1, 2) == "TT") %>%
+  # filter for directed E166 tanner crab fisheries
+  filter(substring(fishery, 1, 2) == "TT" | (substring(fishery, 1, 2) %in% c("EI", "QT") & statarea < 660000 & statarea > 0)) %>%
+  # change fishery codes to TT from EI and QT
+  mutate(fishery = gsub("EI|QT", "TT", fishery)) %>%
   # summarise number of crab caught by sex
   group_by(fishery) %>%
   summarise(female = sum(female, na.rm = T),
@@ -216,34 +218,40 @@ dock %>%
 
 ## sublegal males by shell condition
 obs_meas %>%
-  filter(sex == 1,legal == 0) %>%
+  # filter for directed E166 tanner crab fisheries
+  filter(substring(fishery, 1, 2) == "TT" | (substring(fishery, 1, 2) %in% c("EI", "QT") & statarea < 660000 & statarea > 0),
+         sex == 1,legal == 0) %>%
+  # change fishery codes to TT from EI and QT
+  mutate(fishery = gsub("EI|QT", "TT", fishery)) %>%
   f_observer_size_comp(by = 2, lump = F) %>%
   # add a column for total
   mutate(total = rowSums(.[7:ncol(.)])) %>%
-  # filter for filter for tanner e166 fisheries
-  filter(substring(fishery, 1, 2) == "TT") %>%
   # save output
   write_csv(here(paste0("bbrkc/output/", season), "item6a_sublegal_observer_size_comp_tanner_e166_fishery.csv"))
 
 ## all legal males by shell condition
 obs_meas %>%
-  filter(sex == 1, legal %in% c(1, 2, 3, 6)) %>%
+  # filter for directed E166 tanner crab fisheries
+  filter(substring(fishery, 1, 2) == "TT" | (substring(fishery, 1, 2) %in% c("EI", "QT") & statarea < 660000 & statarea > 0),
+         sex == 1, legal %in% c(1, 2, 3, 6)) %>%
+  # change fishery codes to TT from EI and QT
+  mutate(fishery = gsub("EI|QT", "TT", fishery)) %>%
   f_observer_size_comp(by = 2, lump = F) %>%
   # add a column for total
   mutate(total = rowSums(.[7:ncol(.)])) %>%
-  # filter for filter for tanner e166 fisheries
-  filter(substring(fishery, 1, 2) == "TT") %>%
   # save output
   write_csv(here(paste0("bbrkc/output/", season), "item6b_legal_observer_size_comp_tanner_e166_fishery.csv"))
 
 ## females by shell condition
 obs_meas %>%
-  filter(sex == 2) %>%
+  # filter for directed E166 tanner crab fisheries
+  filter(substring(fishery, 1, 2) == "TT" | (substring(fishery, 1, 2) %in% c("EI", "QT") & statarea < 660000 & statarea > 0),
+         sex == 2) %>%
+  # change fishery codes to TT from EI and QT
+  mutate(fishery = gsub("EI|QT", "TT", fishery)) %>%
   f_observer_size_comp(by = 2, lump = F) %>%
   # add a column for total
   mutate(total = rowSums(.[7:ncol(.)])) %>%
-  # filter for filter for tanner e166 fisheries
-  filter(substring(fishery, 1, 2) == "TT") %>%
   # save output
   write_csv(here(paste0("bbrkc/output/", season), "item6c_female_observer_size_comp_tanner_e166_fishery.csv"))
 
