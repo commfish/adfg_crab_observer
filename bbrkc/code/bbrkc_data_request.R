@@ -2,7 +2,7 @@
 ## fishery data request - bbrkc
 ## prepared by: Tyler Jackson
 ## email: tyler.jackson@alaska.gov
-## last updated: 12/9/2020
+## last updated: 12/15/2020
 
 # load ----
 ## custom functions and libraries
@@ -40,23 +40,17 @@ params <- read_csv(here("misc/data", "weight_parameters.csv"))
 
 dock %>%
   # combine bbrkc tf and directed fishery
-  mutate(fishery = gsub("XR", "TR", fishery)) %>%
-  # filter for only fisheries since rationalization
-  filter(as.numeric(substring(fishery, 3, 4)) >= 5,
-         as.numeric(substring(fishery, 3, 4)) < 80,
-         !(fishery %in% c("CO05", "QO05o"))) %>%
-  # remove 'r' in QO05 fishery code
-  mutate(fishery = gsub("r", "", fishery)) -> dock
+  mutate(fishery = gsub("XR|CR", "TR", fishery)) -> dock
 
 obs_meas %>%
   # combine bbrkc tf and directed fishery
-  mutate(fishery = gsub("XR", "TR", fishery)) -> obs_meas
+  mutate(fishery = gsub("XR|CR", "TR", fishery)) -> obs_meas
 
 pot_sum %>%
   # remove added column start_year
   dplyr::select(-start_year) %>%
   # combine bbrkc tf and directed fishery
-  mutate(fishery = gsub("XR", "TR", fishery)) -> pot_sum
+  mutate(fishery = gsub("XR|CR", "TR", fishery)) -> pot_sum
 
 ## summarise fish ticket data by fishery
 fish_tick %>%

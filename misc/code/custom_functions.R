@@ -6,13 +6,11 @@
 
 
 
-
 # dependencies ----
-library(tidyverse, quiet = T)
-library(lubridate)
-library(here)
-library(readxl)
-
+if (!require("tidyverse", quiet = T)) {install.packages("tidyverse"); library(tidyverse)}
+if (!require("lubridate", quiet = T)) {install.packages("lubridate"); library(lubridate)}
+if (!require("here", quiet = T)) {install.packages("here"); library(here)}
+if (!require("readxl", quiet = T)) {install.packages("readxl"); library(readxl)}
 
 # background data for shell condition ----
 ## shell condition levels

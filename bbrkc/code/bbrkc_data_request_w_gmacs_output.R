@@ -3,7 +3,7 @@
 ## output files format - gmacs .dat file
 ## prepared by: Tyler Jackson
 ## email: tyler.jackson@alaska.gov
-## last updated: 12/9/2020
+## last updated: 12/15/2020
 
 # load ----
 ## custom functions and libraries
@@ -11,9 +11,6 @@ source("./misc/code/custom_functions.R")
 
 ## most recent season (remove when timeseries is produced for all items)
 season <- "2019_20"
-
-## bin vector for size comps
-sizebin_vector <- seq(70, 160, 5)
 
 # data inputs ----
 
@@ -27,7 +24,10 @@ obs_meas <- read_csv(here("bbrkc/data", "RKC-1990-2019_crab_dump.csv"))
 pot_sum <- read_csv(here("bbrkc/data", "RKC-1990-2019_potsum.csv"))
 
 ## fish ticket data by stat area
-fish_tick <- read_csv(here("bbrkc/data", "bsai_crab_fish_ticket_summary_stat_area.csv"))
+ft_files <- list.files(here("misc/data/fish_ticket_summaries"), full.names = T)
+c(lapply(grep(".xlsx", ft_files, value = T), f_read_fish_tick_xlsx),
+  lapply(ft_files[!grepl(".xlsx", ft_files)], f_read_fish_tick_xlsx, format = "old")) %>%
+  do.call("rbind", .) -> fish_tick
 
 ## timerseries of directed effort
 dir_effort <- read_csv(here("bbrkc/data", "directed_effort_timeseries_DP.csv"))
@@ -41,23 +41,17 @@ params <- read_csv(here("misc/data", "weight_parameters.csv"))
 
 dock %>%
   # combine bbrkc tf and directed fishery
-  mutate(fishery = gsub("XR", "TR", fishery)) %>%
-  # filter for only fisheries since rationalization
-  filter(as.numeric(substring(fishery, 3, 4)) >= 5,
-         as.numeric(substring(fishery, 3, 4)) < 80,
-         !(fishery %in% c("CO05", "QO05o"))) %>%
-  # remove 'r' in QO05 fishery code
-  mutate(fishery = gsub("r", "", fishery)) -> dock
+  mutate(fishery = gsub("XR|CR", "TR", fishery)) -> dock
 
 obs_meas %>%
   # combine bbrkc tf and directed fishery
-  mutate(fishery = gsub("XR", "TR", fishery)) -> obs_meas
+  mutate(fishery = gsub("XR|CR", "TR", fishery)) -> obs_meas
 
 pot_sum %>%
   # remove added column start_year
   dplyr::select(-start_year) %>%
   # combine bbrkc tf and directed fishery
-  mutate(fishery = gsub("XR", "TR", fishery)) -> pot_sum
+  mutate(fishery = gsub("XR|CR", "TR", fishery)) -> pot_sum
 
 ## summarise fish ticket data by fishery
 fish_tick %>%
