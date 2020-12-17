@@ -89,22 +89,27 @@ Each RKC dataset is manipulated to achieve the following:
 
 ``` r
 # data management ----
-
 ## clean observer and dockside data timeseries
 
 dock %>%
-  # combine bbrkc tf and directed fishery
+  # combine bbrkc tf and directed fishery, adjust codes for tanner e166 fishery
   mutate(fishery = gsub("XR|CR", "TR", fishery)) -> dock
 
 obs_meas %>%
   # combine bbrkc tf and directed fishery
-  mutate(fishery = gsub("XR|CR", "TR", fishery)) -> obs_meas
+  mutate(fishery = gsub("XR|CR", "TR", fishery)) %>%
+  # combine all tanner e166 fishery codes
+  mutate(fishery = gsub("EI|QT", "TT", fishery)) %>%
+  filter(statarea < 660000 & statarea > 0) -> obs_meas
 
 pot_sum %>%
   # remove added column start_year
   dplyr::select(-start_year) %>%
   # combine bbrkc tf and directed fishery
-  mutate(fishery = gsub("XR|CR", "TR", fishery)) -> pot_sum
+  mutate(fishery = gsub("XR|CR", "TR", fishery)) %>%
+  # combine all tanner e166 fishery codes
+  mutate(fishery = gsub("EI|QT", "TT", fishery)) %>%
+  filter(statarea < 660000 & statarea > 0) -> pot_sum
 
 ## summarise fish ticket data by fishery
 fish_tick %>%
@@ -201,9 +206,7 @@ dir_effort %>%
 ## estimate total bycatch
 pot_sum %>%
   # filter for directed E166 tanner crab fisheries
-  filter(substring(fishery, 1, 2) == "TT" | (substring(fishery, 1, 2) %in% c("EI", "QT") & statarea < 660000 & statarea > 0)) %>%
-  # change fishery codes to TT from EI and QT
-  mutate(fishery = gsub("EI|QT", "TT", fishery)) %>%
+  filter(substring(fishery, 1, 2) == "TT") %>%
   # summarise number of crab caught by sex
   group_by(fishery) %>%
   summarise(female = sum(female, na.rm = T),
@@ -322,10 +325,8 @@ and c) females. Each group is output as a separate .csv file.
 ## sublegal males by shell condition
 obs_meas %>%
   # filter for directed E166 tanner crab fisheries
-  filter(substring(fishery, 1, 2) == "TT" | (substring(fishery, 1, 2) %in% c("EI", "QT") & statarea < 660000 & statarea > 0),
+  filter(substring(fishery, 1, 2) == "TT",
          sex == 1,legal == 0) %>%
-  # change fishery codes to TT from EI and QT
-  mutate(fishery = gsub("EI|QT", "TT", fishery)) %>%
   f_observer_size_comp(by = 2, lump = F) %>%
   # add a column for total
   mutate(total = rowSums(.[7:ncol(.)])) %>%
@@ -335,7 +336,7 @@ obs_meas %>%
 ## all legal males by shell condition
 obs_meas %>%
   # filter for directed E166 tanner crab fisheries
-  filter(substring(fishery, 1, 2) == "TT" | (substring(fishery, 1, 2) %in% c("EI", "QT") & statarea < 660000 & statarea > 0),
+  filter(substring(fishery, 1, 2) == "TT",
          sex == 1, legal %in% c(1, 2, 3, 6)) %>%
   f_observer_size_comp(by = 2, lump = F) %>%
   # add a column for total
@@ -346,7 +347,7 @@ obs_meas %>%
 ## females by shell condition
 obs_meas %>%
   # filter for directed E166 tanner crab fisheries
-  filter(substring(fishery, 1, 2) == "TT" | (substring(fishery, 1, 2) %in% c("EI", "QT") & statarea < 660000 & statarea > 0),
+  filter(substring(fishery, 1, 2) == "TT",
          sex == 2) %>%
   f_observer_size_comp(by = 2, lump = F) %>%
   # add a column for total
