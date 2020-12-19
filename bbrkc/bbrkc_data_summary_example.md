@@ -82,15 +82,21 @@ Each RKC dataset is manipulated to achieve the following:
 
 1.  Combine directed IFQ and CDQ, and cost recovery fisheries for
     observer and dockside sampling data  
-2.  Sum fish ticket summary data across stat area. **Note**: *directed
+2.  Filter Tanner crab fisheries in the early 90s to statistical areas
+    East of 166 W longitude, and change codes, so that all E166 Tanner
+    crab fisheries have the prefix “TT”
+3.  Sum fish ticket summary data across stat area. **Note**: *directed
     and cost recovery fisheries are not combined in fish ticket data*.
 
 <!-- end list -->
 
 ``` r
 # data management ----
-## clean observer and dockside data timeseries
 
+## fishery codes for early 90s tanner e166 fisheries
+early_90s_tt <- c("EI91", "EI92", paste0("QT", 93:96))
+
+## clean observer and dockside data timeseries
 dock %>%
   # combine bbrkc tf and directed fishery, adjust codes for tanner e166 fishery
   mutate(fishery = gsub("XR|CR", "TR", fishery)) -> dock
@@ -98,18 +104,20 @@ dock %>%
 obs_meas %>%
   # combine bbrkc tf and directed fishery
   mutate(fishery = gsub("XR|CR", "TR", fishery)) %>%
+  # filter EI and QT fisheries in early 90s by stat areas e166
+  filter(!(fishery %in% early_90s_tt & (statarea > 660000 | statarea < 0))) %>%
   # combine all tanner e166 fishery codes
-  mutate(fishery = gsub("EI|QT", "TT", fishery)) %>%
-  filter(statarea < 660000 & statarea > 0) -> obs_meas
+  mutate(fishery = gsub("EI|QT", "TT", fishery)) -> obs_meas
 
 pot_sum %>%
   # remove added column start_year
   dplyr::select(-start_year) %>%
   # combine bbrkc tf and directed fishery
   mutate(fishery = gsub("XR|CR", "TR", fishery)) %>%
+  # filter EI and QT fisheries in early 90s by stat areas e166
+  filter(!(fishery %in% early_90s_tt & (statarea > 660000 | statarea < 0))) %>%
   # combine all tanner e166 fishery codes
-  mutate(fishery = gsub("EI|QT", "TT", fishery)) %>%
-  filter(statarea < 660000 & statarea > 0) -> pot_sum
+  mutate(fishery = gsub("EI|QT", "TT", fishery))  -> pot_sum
 
 ## summarise fish ticket data by fishery
 fish_tick %>%
