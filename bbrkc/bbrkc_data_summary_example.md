@@ -107,7 +107,7 @@ obs_meas %>%
   # filter EI and QT fisheries in early 90s by stat areas e166
   filter(!(fishery %in% early_90s_tt & (statarea > 660000 | statarea < 0))) %>%
   # combine all tanner e166 fishery codes
-  mutate(fishery = gsub("EI|QT", "TT", fishery)) -> obs_meas
+  mutate(fishery = ifelse(fishery %in% early_90s_tt, gsub("EI|QT", "TT", fishery), fishery)) -> obs_meas
 
 pot_sum %>%
   # remove added column start_year
@@ -117,7 +117,7 @@ pot_sum %>%
   # filter EI and QT fisheries in early 90s by stat areas e166
   filter(!(fishery %in% early_90s_tt & (statarea > 660000 | statarea < 0))) %>%
   # combine all tanner e166 fishery codes
-  mutate(fishery = gsub("EI|QT", "TT", fishery))  -> pot_sum
+  mutate(fishery = ifelse(fishery %in% early_90s_tt, gsub("EI|QT", "TT", fishery), fishery)) -> pot_sum
 
 ## summarise fish ticket data by fishery
 fish_tick %>%
