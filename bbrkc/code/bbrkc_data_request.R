@@ -2,7 +2,7 @@
 ## fishery data request - bbrkc
 ## prepared by: Tyler Jackson
 ## email: tyler.jackson@alaska.gov
-## last updated: 12/15/2020
+## last updated: 1/5/2020
 
 # load ----
 ## custom functions and libraries
@@ -66,7 +66,7 @@ pot_sum %>%
 fish_tick %>%
   dplyr::select(-stat_area, -cpue, -avg_wt, -price_lbs) %>%
   group_by(fishery) %>%
-  summarise_all(sum, na.rm = T) -> fish_tick
+  summarise_all(sum, na.rm = T) -> fish_tick_summary
 
 
 # item 1 ----
@@ -127,7 +127,9 @@ obs_meas %>%
   
 ## get direct effort in the tanner e166 fishery
 dir_effort %>%
-  filter(substring(fishery, 1, 2) == "TT") -> directed_effort
+  filter(substring(fishery, 1, 2) == "TT") %>%
+  # change directed effort (illegal) in 2017 to 0 (no RKC caught)
+  mutate(effort = ifelse(fishery == "TT17", 0, effort)) -> directed_effort
 
 ## estimate total bycatch
 pot_sum %>%
@@ -162,7 +164,7 @@ pot_sum %>%
 
 # item 3 ----
 ## fish ticket summary by fishery, TR and XR fisheries separate
-fish_tick %>%
+fish_tick_summary %>%
   # filter for bbrkc directed and cost recovery fishery
   filter(substring(fishery, 1, 2) %in% c("TR", "XR")) %>%
   # decihper fishery code

@@ -3,7 +3,7 @@
 ## output files format - gmacs .dat file
 ## prepared by: Tyler Jackson
 ## email: tyler.jackson@alaska.gov
-## last updated: 12/15/2020
+## last updated: 1/5/2020
 
 # load ----
 ## custom functions and libraries
@@ -70,7 +70,7 @@ pot_sum %>%
 fish_tick %>%
   dplyr::select(-stat_area, -cpue, -avg_wt, -price_lbs) %>%
   group_by(fishery) %>%
-  summarise_all(sum, na.rm = T) -> fish_tick
+  summarise_all(sum, na.rm = T) -> fish_tick_summary
 
 # item 1 ----
 ## total catch of sublegal males and females in the most recent directed 
@@ -174,7 +174,9 @@ dir_catch_est %>%
 
 ## get direct effort in the tanner e166 fishery
 dir_effort %>%
-  filter(substring(fishery, 1, 2) == "TT") -> directed_effort
+  filter(substring(fishery, 1, 2) == "TT") %>%
+  # change directed effort (illegal) in 2017 to 0 (no RKC caught)
+  mutate(effort = ifelse(fishery == "TT17", 0, effort)) -> directed_effort
 
 ## estimate total bycatch
 pot_sum %>%
@@ -251,7 +253,7 @@ crab_fishery_bycatch_est %>%
 
 # item 3 ----
 ## fish ticket summary by fishery, TR and XR fisheries separate
-fish_tick %>%
+fish_tick_summary %>%
   # filter for bbrkc directed and cost recovery fishery
   filter(substring(fishery, 1, 2) %in% c("TR", "XR")) %>%
   # decihper fishery code and filter for most recent season
@@ -265,7 +267,9 @@ fish_tick %>%
 
 ## total males
 obs_meas %>%
-  filter(sex == 1, legal %in% c(0, 1, 2, 3, 6)) %>%
+  filter(sex == 1, 
+         legal %in% c(0, 1, 2, 3, 6),
+         size >= 65) %>%
   f_observer_size_comp(by = 2, lump = F) %>%
   # add a column for total, size bin
   mutate(total = rowSums(.[7:ncol(.)]),
@@ -278,7 +282,9 @@ obs_meas %>%
   group_by(opening_year, size_bin, .drop = F) %>%
   summarise(total = sum(total, na.rm = T)) %>%
   group_by(opening_year) %>%
-  mutate(prop =  sprintf('%.4f', total / sum(total))) %>%
+  # compute proportion in size bin and effective number of samples
+  mutate(prop =  sprintf('%.4f', total / sum(total)),
+         nsamp = min(0.05*sum(total), 100)) %>%
   ungroup() %>%
   # pivot to wide format
   dplyr::select(-total) %>%
@@ -290,15 +296,15 @@ obs_meas %>%
          sex = 1,
          type = 0,
          shell = 0,
-         maturity = 0,
-         nsamp = 100) %>%
+         maturity = 0) %>%
   dplyr::select(year, season, fleet, sex, type, shell, maturity, nsamp, grep("cl", names(.), value = T)) %>%
   rbind(c("#year", "season", "fleet", "sex", "type", "shell", "maturity", "nsamp", "datavector", rep(NA, 19)), .) %>%
   write_delim(here(paste0("bbrkc/output/", season), "item4a_directed_fishery_size_comp_total_males.txt"), delim = "\t", col_names = F, na = "")
 
 ## total females
 obs_meas %>%
-  filter(sex == 2) %>%
+  filter(sex == 2,
+         size >= 65) %>%
   f_observer_size_comp(by = 2, lump = F) %>%
   # add a column for total, size bin
   mutate(total = rowSums(.[7:ncol(.)]),
@@ -311,7 +317,8 @@ obs_meas %>%
   group_by(opening_year, size_bin, .drop = F) %>%
   summarise(total = sum(total, na.rm = T)) %>%
   group_by(opening_year) %>%
-  mutate(prop =  sprintf('%.4f', total / sum(total))) %>%
+  mutate(prop =  sprintf('%.4f', total / sum(total)),
+         nsamp = min(0.05*sum(total), 50)) %>%
   ungroup() %>%
   # pivot to wide format
   dplyr::select(-total) %>%
@@ -323,8 +330,7 @@ obs_meas %>%
          sex = 2,
          type = 0,
          shell = 0,
-         maturity = 0,
-         nsamp = 50) %>%
+         maturity = 0) %>%
   dplyr::select(year, season, fleet, sex, type, shell, maturity, nsamp, grep("cl", names(.), value = T)) %>%
   rbind(c("#year", "season", "fleet", "sex", "type", "shell", "maturity", "nsamp", "datavector", rep(NA, 15)), .) %>%
   write_delim(here(paste0("bbrkc/output/", season), "item4b_directed_fishery_size_comp_total_females.txt"), delim = "\t", col_names = F, na = "")
@@ -348,7 +354,8 @@ dock %>%
   group_by(opening_year, size_bin, .drop = F) %>%
   summarise(total = sum(total, na.rm = T)) %>%
   group_by(opening_year) %>%
-  mutate(prop =  sprintf('%.4f', total / sum(total))) %>%
+  mutate(prop =  sprintf('%.4f', total / sum(total)),
+         nsamp = min(0.05*sum(total), 100)) %>%
   ungroup() %>%
   # pivot to wide format
   dplyr::select(-total) %>%
@@ -360,8 +367,7 @@ dock %>%
          sex = 1,
          type = 1,
          shell = 0,
-         maturity = 0,
-         nsamp = 100) %>%
+         maturity = 0) %>%
   dplyr::select(year, season, fleet, sex, type, shell, maturity, nsamp, grep("cl", names(.), value = T)) %>%
   rbind(c("#year", "season", "fleet", "sex", "type", "shell", "maturity", "nsamp", "datavector", rep(NA, 19)), .) %>%
   write_delim(here(paste0("bbrkc/output/", season), "item5_directed_fishery_size_comp_retained_males.txt"), delim = "\t", col_names = F, na = "") 
@@ -373,7 +379,8 @@ dock %>%
 ## observer size composition, by legal status and shell condition from tanner crab e166 fishery
 obs_meas %>%
   filter(legal %in% c(-7, 0, 1, 2, 3, 6),
-         substring(fishery, 1, 2) == "TT") %>%
+         substring(fishery, 1, 2) == "TT",
+         size >= 65) %>%
   f_observer_size_comp(by = 2, lump = F) %>%
   # add a column for total, size bin
   mutate(total = rowSums(.[7:ncol(.)]),
@@ -386,7 +393,8 @@ obs_meas %>%
   group_by(opening_year, sex, size_bin, .drop = F) %>%
   summarise(total = sum(total, na.rm = T)) %>%
   group_by(opening_year) %>%
-  mutate(prop =  sprintf('%.4f', total / sum(total))) %>%
+  mutate(prop =  sprintf('%.4f', total / sum(total)),
+         nsamp = min(0.05*sum(total), 50)) %>%
   ungroup() %>%
   # pivot to wide format
   dplyr::select(-total) %>%
@@ -402,8 +410,7 @@ tt_size_comp %>%
          sex = 1,
          type = 0,
          shell = 0,
-         maturity = 0,
-         nsamp = 50) %>%
+         maturity = 0) %>%
   dplyr::select(year, season, fleet, sex, type, shell, maturity, nsamp, grep("cl", names(.), value = T)) %>%
   rbind(c("#year", "season", "fleet", "sex", "type", "shell", "maturity", "nsamp", "datavector", rep(NA, 19)), .) %>%
   write_delim(here(paste0("bbrkc/output/", season), "item6a_tanner_e166_size_comp_males.txt"), delim = "\t", col_names = F, na = "")
@@ -412,7 +419,7 @@ tt_size_comp %>%
 tt_size_comp %>%
   filter(sex == "female") %>%
   # combine last five bins to one
-  mutate_at(18:22, as.numeric) %>%
+  mutate_at(19:23, as.numeric) %>%
   mutate(cl142.5 =  sprintf('%.4f', cl142.5 + cl147.5 + cl152.5 + cl157.5 + cl162.5)) %>%
   dplyr::select(-cl147.5, -cl152.5, -cl157.5, -cl162.5) %>%
   # additional data

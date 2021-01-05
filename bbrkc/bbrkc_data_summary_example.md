@@ -123,7 +123,7 @@ pot_sum %>%
 fish_tick %>%
   dplyr::select(-stat_area, -cpue, -avg_wt, -price_lbs) %>%
   group_by(fishery) %>%
-  summarise_all(sum, na.rm = T) -> fish_tick
+  summarise_all(sum, na.rm = T) -> fish_tick_summary
 ```
 
 ### Item 1
@@ -209,7 +209,9 @@ took place in the preceeding season, the output will consist of an empty
 ``` r
 ## get direct effort in the tanner e166 fishery
 dir_effort %>%
-  filter(substring(fishery, 1, 2) == "TT") -> directed_effort
+  filter(substring(fishery, 1, 2) == "TT") %>%
+  # change directed effort (illegal) in 2017 to 0 (no RKC caught)
+  mutate(effort = ifelse(fishery == "TT17", 0, effort)) -> directed_effort
 
 ## estimate total bycatch
 pot_sum %>%
