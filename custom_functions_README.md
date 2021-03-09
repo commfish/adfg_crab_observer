@@ -56,6 +56,42 @@ f_sdr(x = dock, col = "fishery", type = "fishery_code")
     ## # ... with 11,208 more rows, and 3 more variables: legal <dbl>, shell <dbl>,
     ## #   numcrab <dbl>
 
+### Adjust Historic Fishery Codes `f_fish_code_adjust()`
+
+This function alters old fishery letter codes to align with
+post-rationalization codes. CDQ and test fisheries are combined with IFQ
+fisheries, and old area specific codes are changed (e.g., EI91 refers to
+a combined east and west Tanner crab fishery). Combined fisheries are
+apportioned to distinct management areas by district boundary.
+
+Arguments:
+
+  - **x** - data source, must include species code (e.g. 932, 931,
+    etc)  
+  - **type** - type of data source. ‘dockeside’ = dockside sampling data
+    dump, ‘obs’ = observer data dumps.
+
+Usage: Example using dockside sampling data
+
+``` r
+f_fish_code_adjust(x = dock, type = "dockside")
+```
+
+    ## # A tibble: 11,218 x 8
+    ##    fishery  adfg sampdate   spcode  size legal shell numcrab
+    ##    <chr>   <dbl> <date>      <dbl> <dbl> <dbl> <dbl>   <dbl>
+    ##  1 QO19        7 2020-02-09    932    92     1     2       1
+    ##  2 QO19        7 2020-02-09    932    96     1     2       1
+    ##  3 QO19        7 2020-02-09    932    98     1     2       1
+    ##  4 QO19        7 2020-02-09    932    99     1     2       2
+    ##  5 QO19        7 2020-02-09    932   100     1     2       5
+    ##  6 QO19        7 2020-02-09    932   101     1     2       6
+    ##  7 QO19        7 2020-02-09    932   102     1     2       4
+    ##  8 QO19        7 2020-02-09    932   103     1     2       3
+    ##  9 QO19        7 2020-02-09    932   104     1     2      10
+    ## 10 QO19        7 2020-02-09    932   105     1     2       7
+    ## # ... with 11,208 more rows
+
 ### Legal Status `f_legal_status()`
 
 This function creates a column of logical values (T/F) denoting whether
@@ -202,12 +238,13 @@ f_average_wt(x = obs_meas, by = 4, legal_code = T, units = "lbs")
 
     ## `summarise()` regrouping output by 'fishery', 'sex' (override with `.groups` argument)
 
-    ## # A tibble: 2 x 4
-    ## # Groups:   fishery, sex [1]
+    ## # A tibble: 3 x 4
+    ## # Groups:   fishery, sex [2]
     ##   fishery   sex legal_status avg_wt
     ##   <chr>   <dbl>        <dbl>  <dbl>
     ## 1 QO19        1            0  0.367
     ## 2 QO19        1            1  0.891
+    ## 3 QO19        2            0  0.197
 
 ### Day of Season `f_sday`
 

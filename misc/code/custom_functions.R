@@ -46,6 +46,149 @@ tibble(spcode = c(932, 931, 931, 921),
 
 
 
+
+# f_fish_code_adjust ----
+f_fish_code_adjust <- function(x, type) {
+  ## get file species
+  spp <- unique(x$spcode)
+  
+  ## rkc dockside file
+  if(spp == 921 & type == "dockside"){
+    x %>%
+      # cdq and test bbrkc rkc fisheries to TR
+      mutate(fishery = gsub("XR|CR", "TR", fishery)) %>% 
+      # filter EI and QT fisheries in early 90s by stat areas e166
+      # filter(!(fishery %in% c("EI91", "EI92", paste0("QT", 93:96)) & (statarea > 660000 | statarea < 0))) %>%
+      # combine all tanner e166 fishery codes
+      mutate(fishery = ifelse((fishery %in% c("EI91", "EI92", paste0("QT", 93:96))), 
+                              paste0("QT", substring(fishery, 3, 4)),
+                              fishery)) -> tmp
+    # mutate(fishery = ifelse(fishery %in% c("EI91", "EI92", paste0("QT", 93:96)), gsub("EI|QT", "TT", fishery), fishery)) -> tmp
+  }
+  
+  ## snow dockside file
+  if(spp == 932 & type == "dockside") {
+    x %>%
+      # adjust year based on sample date so that fisheries prosecuted in spring get previous year code
+      mutate(fishery_adj = ifelse((month(ymd(sampdate)) < 7 & (substring(year(ymd(sampdate)), 3, 4) == substring(fishery, 3, 4))),
+                                  paste0(substring(fishery, 1, 2), substring(year(ymd(sampdate)) - 1, 3, 4)),
+                                  fishery),
+             # fix transition to rationalization yr
+             fishery_adj = gsub("QO05r", "QO05", fishery_adj),
+             # cdq and eo fisheries to QO
+             fishery_adj = gsub("CO|EO", "QO", fishery_adj),
+             # bbrkc test fish and cdq fisheries to TR
+             fishery_adj = gsub("XR|CR", "TR", fishery_adj),
+             # early tanner crab fisheries to QT or TT based on e166 line
+             fishery_adj = ifelse((fishery %in% c("EI91", "EI92", paste0("QT", 93:96))), 
+                                  paste0("QT", substring(fishery_adj, 3, 4)),
+                                  fishery_adj)) %>%
+      # fishery_adj = ifelse((fishery %in% c("EI91", "EI92", paste0("QT", 93:96)) & (statarea > 660000 | statarea < 0)),
+      #                      paste0("QT", substring(fishery_adj, 3, 4)),
+      #                      fishery_adj),
+      # fishery_adj = ifelse((fishery %in% c("EI91", "EI92", paste0("QT", 93:96)) & (statarea <= 660000 | statarea >= 0)),
+      #                      paste0("TT", substring(fishery_adj, 3, 4)),
+      #                      fishery_adj)) %>%
+      # replace fishery with fishery_adj
+      mutate(fishery = fishery_adj) %>%
+      dplyr::select(-fishery_adj) -> tmp
+  }
+  
+  # tanner dockside file
+  if(spp == 931 & type == "dockside"){
+    x  %>%
+      # adjust year based on sample date so that fisheries prosecuted in spring get previous year code
+      mutate(fishery_adj = ifelse((month(ymd(sampdate)) < 7 & substring(year(ymd(sampdate)), 3, 4) == substring(fishery, 3, 4)),
+                                  paste0(substring(fishery, 1, 2), substring(year(ymd(sampdate)) - 1, 3, 4)),
+                                  fishery),
+             # fix transition to rationalization yr
+             fishery_adj = gsub("QO05r", "QO05", fishery_adj),
+             # cdq and eo fisheries to QO
+             fishery_adj = gsub("CO|EO", "QO", fishery_adj),
+             # bbrkc test fish and cdq fisheries to TR
+             fishery_adj = gsub("XR|CR", "TR", fishery_adj),
+             # early tanner crab fisheries to QT or TT based on e166 line
+             fishery_adj = ifelse((fishery %in% c("EI91", "EI92", paste0("QT", 93:96))), 
+                                  paste0("QT", substring(fishery_adj, 3, 4)),
+                                  fishery_adj)) %>%
+      #fishery_adj = ifelse((fishery %in% c("EI91", "EI92", paste0("QT", 93:96)) & (statarea > 660000 | statarea < 0)),
+      # paste0("QT", substring(fishery_adj, 3, 4)),
+      # fishery_adj),
+      #fishery_adj = ifelse((fishery %in% c("EI91", "EI92", paste0("QT", 93:96)) & (statarea <= 660000 | statarea >= 0)),
+      # paste0("TT", substring(fishery_adj, 3, 4)),
+      # fishery_adj)) %>%
+      # replace fishery with fishery_adj
+      mutate(fishery = fishery_adj) %>%
+      dplyr::select(-fishery_adj) -> tmp
+  }
+  
+  ## rkc obs dump files
+  if(spp == 921 & type == "obs"){
+    x %>%
+      # cdq and test bbrkc rkc fisheries to TR
+      mutate(fishery = gsub("XR|CR", "TR", fishery)) %>% 
+      # filter EI and QT fisheries in early 90s by stat areas e166
+      filter(!(fishery %in% c("EI91", "EI92", paste0("QT", 93:96)) & (statarea > 660000 | statarea < 0))) %>%
+      # combine all tanner e166 fishery codes
+      mutate(fishery = ifelse(fishery %in% c("EI91", "EI92", paste0("QT", 93:96)), gsub("EI|QT", "TT", fishery), fishery)) -> tmp
+  }
+  
+  ## snow obs dump files
+  if(spp == 932 & type == "obs") {
+    x %>%
+      # adjust year based on sample date so that fisheries prosecuted in spring get previous year code
+      mutate(fishery_adj = ifelse((month(mdy(sampdate)) < 7 & (substring(year(mdy(sampdate)), 3, 4) == substring(fishery, 3, 4))),
+                                  paste0(substring(fishery, 1, 2), substring(year(mdy(sampdate)) - 1, 3, 4)),
+                                  fishery),
+             # fix transition to rationalization yr
+             fishery_adj = gsub("QO05r", "QO05", fishery_adj),
+             # cdq and eo fisheries to QO
+             fishery_adj = gsub("CO|EO", "QO", fishery_adj),
+             # cdq rkc and bkc fisheries to PIBKC
+             fishery_adj = gsub("CK", "QP", fishery_adj),
+             # bbrkc test fish and cdq fisheries to TR
+             fishery_adj = gsub("XR|CR", "TR", fishery_adj),
+             # early tanner crab fisheries to QT or TT based on e166 line
+             fishery_adj = ifelse((fishery %in% c("EI91", "EI92", paste0("QT", 93:96)) & (statarea > 660000 | statarea < 0)),
+                                  paste0("QT", substring(fishery_adj, 3, 4)),
+                                  fishery_adj),
+             fishery_adj = ifelse((fishery %in% c("EI91", "EI92", paste0("QT", 93:96)) & (statarea <= 660000 | statarea >= 0)),
+                                  paste0("TT", substring(fishery_adj, 3, 4)),
+                                  fishery_adj)) %>%
+      # replace fishery with fishery_adj
+      mutate(fishery = fishery_adj) %>%
+      dplyr::select(-fishery_adj) -> tmp
+  }
+  
+  # tanner obs dump files
+  if(spp == 931 & type == "obs"){
+    x  %>%
+      # adjust year based on sample date so that fisheries prosecuted in spring get previous year code
+      mutate(fishery_adj = ifelse((month(mdy(sampdate)) < 7 & substring(year(mdy(sampdate)), 3, 4) == substring(fishery, 3, 4)),
+                                  paste0(substring(fishery, 1, 2), substring(year(mdy(sampdate)) - 1, 3, 4)),
+                                  fishery),
+             # fix transition to rationalization yr
+             fishery_adj = gsub("QO05r", "QO05", fishery_adj),
+             # cdq and eo fisheries to QO
+             fishery_adj = gsub("CO|EO", "QO", fishery_adj),
+             # bbrkc test fish and cdq fisheries to TR
+             fishery_adj = gsub("XR|CR", "TR", fishery_adj),
+             # early tanner crab fisheries to QT or TT based on e166 line
+             fishery_adj = ifelse((fishery %in% c("EI91", "EI92", paste0("QT", 93:96)) & (statarea > 660000 | statarea < 0)),
+                                  paste0("QT", substring(fishery_adj, 3, 4)),
+                                  fishery_adj),
+             fishery_adj = ifelse((fishery %in% c("EI91", "EI92", paste0("QT", 93:96)) & (statarea <= 660000 | statarea >= 0)),
+                                  paste0("TT", substring(fishery_adj, 3, 4)),
+                                  fishery_adj)) %>%
+      # replace fishery with fishery_adj
+      mutate(fishery = fishery_adj) %>%
+      dplyr::select(-fishery_adj) -> tmp
+  }
+  
+  tmp
+  
+}
+
 # f_sdr ----
 # custom function for 'uncoding' fishery, shell condition and legal status codes into readily understandable text 
 # argument: x   - data frame or tibble containing a code column
@@ -314,8 +457,8 @@ f_average_wt <- function(x, by, legal_code = T, units = "kg"){
   if(unique(x$spcode) %in% 931:932){
     x %>%
       mutate(maturity = case_when(sex == 1 ~ "male",
-                                  sex == 2 & maturity == 1 ~ "mature", 
-                                  sex == 2 & maturity == 0 ~ "immature")) -> x
+                                  sex == 2 & (maturity == 1 | clutch > 0) ~ "mature", 
+                                  sex == 2 & (maturity == 0 | clutch <= 0) ~ "immature")) -> x
   }
   
   if(by == 1){
