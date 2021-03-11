@@ -20,7 +20,7 @@ obs_meas <- read_csv(here("tanner_crab/data", "TANNER-1990-2019_crab_dump.csv"))
 pot_sum <- read_csv(here("tanner_crab/data", "TANNER-1990-2019_potsum.csv"))
 
 ## fish ticket data
-bd_ft_summary <- read_csv(here("./snow_crab/data", "retained_catch_all_fisheries.csv"))
+bd_ft_summary <- read_csv(here("./tanner_crab/data", "retained_catch_all_fisheries.csv"))
 
 # data management ----
 
