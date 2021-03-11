@@ -43,10 +43,6 @@ tibble(spcode = c(932, 931, 931, 921),
        fishery_area = c(NA, "E166", "W166", NA),
        legal_size_mm = c(78, 121, 111, 135)) -> legal_size
 
-
-
-
-
 # f_fish_code_adjust ----
 f_fish_code_adjust <- function(x, type) {
   ## get file species
@@ -108,7 +104,7 @@ f_fish_code_adjust <- function(x, type) {
              # bbrkc test fish and cdq fisheries to TR
              fishery_adj = gsub("XR|CR", "TR", fishery_adj),
              # early tanner crab fisheries to QT or TT based on e166 line
-             fishery_adj = ifelse((fishery %in% c("EI91", "EI92", paste0("QT", 93:96))), 
+             fishery_adj = ifelse((fishery %in% c("EI89", "EI90", "EI91", "EI92", paste0("QT", 93:96))), 
                                   paste0("QT", substring(fishery_adj, 3, 4)),
                                   fishery_adj)) %>%
       #fishery_adj = ifelse((fishery %in% c("EI91", "EI92", paste0("QT", 93:96)) & (statarea > 660000 | statarea < 0)),
@@ -171,13 +167,15 @@ f_fish_code_adjust <- function(x, type) {
              fishery_adj = gsub("QO05r", "QO05", fishery_adj),
              # cdq and eo fisheries to QO
              fishery_adj = gsub("CO|EO", "QO", fishery_adj),
+             # cdq rkc and bkc fisheries to PIBKC
+             fishery_adj = gsub("CK", "QP", fishery_adj),
              # bbrkc test fish and cdq fisheries to TR
              fishery_adj = gsub("XR|CR", "TR", fishery_adj),
              # early tanner crab fisheries to QT or TT based on e166 line
-             fishery_adj = ifelse((fishery %in% c("EI91", "EI92", paste0("QT", 93:96)) & (statarea > 660000 | statarea < 0)),
+             fishery_adj = ifelse((fishery %in% c("EI89", "EI90", "EI91", "EI92", paste0("QT", 93:96)) & (statarea > 660000 | statarea < 0)),
                                   paste0("QT", substring(fishery_adj, 3, 4)),
                                   fishery_adj),
-             fishery_adj = ifelse((fishery %in% c("EI91", "EI92", paste0("QT", 93:96)) & (statarea <= 660000 | statarea >= 0)),
+             fishery_adj = ifelse((fishery %in% c("EI89", "EI90", "EI91", "EI92", paste0("QT", 93:96)) & (statarea <= 660000 | statarea >= 0)),
                                   paste0("TT", substring(fishery_adj, 3, 4)),
                                   fishery_adj)) %>%
       # replace fishery with fishery_adj
@@ -282,7 +280,8 @@ f_legal_status <- function(x){
       mutate(fishery_area = ifelse(substring(fishery, 1, 2) %in% c("TT", "TR", "XR"), 
                                    "E166", "W166")) %>% 
       left_join(legal_size, by = c("spcode", "fishery_area")) %>%
-      mutate(legal_status = ifelse((sex == 1 & size >= legal_size_mm), T, F)) %>%
+      mutate(legal_size_mm = ifelse(as.numeric(substring(fishery, 3, 4)) %in% c(0:10, 80:99), 140, legal_size_mm),
+             legal_status = ifelse((sex == 1 & size >= legal_size_mm), T, F)) %>%
       dplyr::select(-legal_size_mm, -fishery_area) -> tmp
   } else {
     x %>%
