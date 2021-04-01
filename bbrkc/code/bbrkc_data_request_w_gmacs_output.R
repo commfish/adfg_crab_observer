@@ -9,9 +9,6 @@
 ## custom functions and libraries
 source("./misc/code/custom_functions.R")
 
-## most recent season (remove when timeseries is produced for all items)
-season <- "2019_20"
-
 ## bin vector for size comps
 sizebin_vector <- seq(70, 160, 5)
 
@@ -143,7 +140,7 @@ dir_catch_est %>%
   # re-order, comment out header, and save .txt file
   dplyr::select(year, season, fleet, sex, obs, cv, type, units, mult, effort, discard_mortality) %>%
   rename(`#year` = year) %>%
-  write_delim(here(paste0("bbrkc/output/", season), "item1a_total_catch_directed_fishery_males.txt"), delim = "\t")
+  write_delim(here("bbrkc/output", "item1a_total_catch_directed_fishery_males.txt"), delim = "\t")
 
 ## female discards (t) in directed fishery (gmacs format)
 dir_catch_est %>%
@@ -164,7 +161,7 @@ dir_catch_est %>%
   # re-order, comment out header, and save .txt file
   dplyr::select(year, season, fleet, sex, obs, cv, type, units, mult, effort, discard_mortality) %>%
   rename(`#year` = year) %>%
-  write_delim(here(paste0("bbrkc/output/", season), "item1b_total_catch_directed_fishery_females.txt"), delim = "\t")
+  write_delim(here("bbrkc/output", "item1b_total_catch_directed_fishery_females.txt"), delim = "\t")
   
 
 
@@ -226,7 +223,7 @@ crab_fishery_bycatch_est %>%
   # comment out years when the fishery is closed
   mutate(potlifts = ifelse(potlifts == 0, 0.0001, potlifts),
          year = ifelse(potlifts == 0.0001, paste0("#", year), year)) %>%
-  write_delim(here(paste0("bbrkc/output/", season), "item2a_tanner_e166_bycatch_males.txt"), delim = "\t")
+  write_delim(here("bbrkc/output", "item2a_tanner_e166_bycatch_males.txt"), delim = "\t")
 
 ## total female catch (t) in tanner crab fishery e166 (gmacs format)
 crab_fishery_bycatch_est %>%
@@ -248,7 +245,7 @@ crab_fishery_bycatch_est %>%
   # comment out years when the fishery is closed
   mutate(potlifts = ifelse(potlifts == 0, 0.0001, potlifts),
          year = ifelse(potlifts == 0.0001, paste0("#", year), year)) %>%
-  write_delim(here(paste0("bbrkc/output/", season), "item2b_tanner_e166_bycatch_female.txt"), delim = "\t")
+  write_delim(herepaste0("bbrkc/output", "item2b_tanner_e166_bycatch_female.txt"), delim = "\t")
 
 
 # item 3 ----
@@ -260,7 +257,7 @@ fish_tick_summary %>%
   f_sdr(col = "fishery", type = "fishery_code") %>%
   filter(opening_year == as.numeric(substring(season, 1, 4))) %>%
   # save output
-  write_csv(here(paste0("bbrkc/output/", season), "item3_fish_ticket_summary.csv"))
+  write_csv(here("bbrkc/output", "item3_fish_ticket_summary.csv"))
 
 # item 4 ----
 ## observer size composition, by sex from bbrkc directed fishery
@@ -273,18 +270,25 @@ obs_meas %>%
   f_observer_size_comp(by = 2, lump = F) %>%
   # add a column for total, size bin
   mutate(total = rowSums(.[7:ncol(.)]),
-         size_bin = cut(size, 
-                        breaks = c(0, sizebin_vector, Inf),
-                        labels = paste0("cl", seq(67.5, 162.5, 5)))) %>%
-  # filter for most recent directed fishery
+         size_bin = ifelse(size > 160, 160, floor(size/ 5) * 5)) %>%
+  # filter for directed fisheries
   filter(substring(fishery, 1, 2) == "TR") %>%
-  # sum across size bins, normalize 0 - 1
-  group_by(opening_year, size_bin, .drop = F) %>%
+  # sum across size bins
+  group_by(fishery, size_bin, .drop = F) %>%
   summarise(total = sum(total, na.rm = T)) %>%
+  # pull in missing bins
+  full_join(expand_grid(size_bin = seq(65, 160, by = 5),
+                        fishery = filter(obs_meas, substring(fishery, 1, 2) == "TR") %>% pull(fishery) %>% unique),
+            by = c("fishery", "size_bin")) %>%
+  replace_na(list(total = 0)) %>%
+  # add opening year in again
+  f_sdr(., col = "fishery", type = "fishery_code") %>%
+  # normalise to sum to 1
   group_by(opening_year) %>%
   # compute proportion in size bin and effective number of samples
   mutate(prop =  sprintf('%.4f', total / sum(total)),
-         nsamp = min(0.05*sum(total), 100)) %>%
+         nsamp = min(0.05*sum(total), 100),
+         ncrab = paste0("#", sum(total))) %>%
   ungroup() %>%
   # pivot to wide format
   dplyr::select(-total) %>%
@@ -297,9 +301,10 @@ obs_meas %>%
          type = 0,
          shell = 0,
          maturity = 0) %>%
-  dplyr::select(year, season, fleet, sex, type, shell, maturity, nsamp, grep("cl", names(.), value = T)) %>%
-  rbind(c("#year", "season", "fleet", "sex", "type", "shell", "maturity", "nsamp", "datavector", rep(NA, 19)), .) %>%
-  write_delim(here(paste0("bbrkc/output/", season), "item4a_directed_fishery_size_comp_total_males.txt"), delim = "\t", col_names = F, na = "")
+  arrange(year) %>%
+  dplyr::select(year, season, fleet, sex, type, shell, maturity, nsamp, grep("\\d", names(.), value = T), ncrab) %>%
+  rbind(c("#year", "season", "fleet", "sex", "type", "shell", "maturity", "nsamp", "datavector", rep(NA, 20)), .) %>%
+  write_delim(here("bbrkc/output", "item4a_directed_fishery_size_comp_total_males.txt"), delim = "\t", col_names = F, na = "")
 
 ## total females
 obs_meas %>%
@@ -308,21 +313,28 @@ obs_meas %>%
   f_observer_size_comp(by = 2, lump = F) %>%
   # add a column for total, size bin
   mutate(total = rowSums(.[7:ncol(.)]),
-         size_bin = cut(size, 
-                        breaks = c(0, sizebin_vector[-c(16:20)], Inf),
-                        labels = paste0("cl", seq(67.5, 142.5, 5)))) %>%
-  # filter for most recent directed fishery
+         size_bin = ifelse(size > 140, 140, floor(size/ 5) * 5)) %>%
+  # filter for directed fisheries
   filter(substring(fishery, 1, 2) == "TR") %>%
-  # sum across size bins, normalize 0 - 1
-  group_by(opening_year, size_bin, .drop = F) %>%
+  # sum across size bins
+  group_by(fishery, size_bin, .drop = F) %>%
   summarise(total = sum(total, na.rm = T)) %>%
+  # pull in missing bins
+  full_join(expand_grid(size_bin = seq(65, 140, by = 5),
+                        fishery = filter(obs_meas, substring(fishery, 1, 2) == "TR") %>% pull(fishery) %>% unique),
+            by = c("fishery", "size_bin")) %>%
+  replace_na(list(total = 0)) %>%
+  # add opening year in again
+  f_sdr(., col = "fishery", type = "fishery_code") %>%
+  # normalise to sum to 1
   group_by(opening_year) %>%
   mutate(prop =  sprintf('%.4f', total / sum(total)),
-         nsamp = min(0.05*sum(total), 50)) %>%
+         nsamp = min(0.05*sum(total), 50),
+         ncrab = paste0("#", sum(total))) %>%
   ungroup() %>%
   # pivot to wide format
   dplyr::select(-total) %>%
-  pivot_wider(names_from = "size_bin", values_from = "prop") %>%
+  pivot_wider(names_from = "size_bin", values_from = "prop", names_sort = T) %>%
   # additional data
   mutate(year = opening_year,
          season = 3, 
@@ -331,9 +343,10 @@ obs_meas %>%
          type = 0,
          shell = 0,
          maturity = 0) %>%
-  dplyr::select(year, season, fleet, sex, type, shell, maturity, nsamp, grep("cl", names(.), value = T)) %>%
-  rbind(c("#year", "season", "fleet", "sex", "type", "shell", "maturity", "nsamp", "datavector", rep(NA, 15)), .) %>%
-  write_delim(here(paste0("bbrkc/output/", season), "item4b_directed_fishery_size_comp_total_females.txt"), delim = "\t", col_names = F, na = "")
+  arrange(year) %>%
+  dplyr::select(year, season, fleet, sex, type, shell, maturity, nsamp, grep("\\d", names(.), value = T), ncrab) %>%
+  rbind(c("#year", "season", "fleet", "sex", "type", "shell", "maturity", "nsamp", "datavector", rep(NA, 16)), .) %>%
+  write_delim(here("bbrkc/output", "item4b_directed_fishery_size_comp_total_females.txt"), delim = "\t", col_names = F, na = "")
 
 
 
@@ -345,21 +358,26 @@ dock %>%
   f_retained_size_comp(lump = F) %>%
   # add a column for total, size bin
   mutate(total = rowSums(.[6:ncol(.)]),
-         size_bin = cut(size, 
-                        breaks = c(0, sizebin_vector, Inf),
-                        labels = paste0("cl", seq(67.5, 162.5, 5)))) %>%
+         size_bin = ifelse(size > 160, 160, floor(size/ 5) * 5)) %>%
   # filter for most recent directed fishery
   filter(substring(fishery, 1, 2) == "TR") %>%
   # sum across size bins, normalize to 1
-  group_by(opening_year, size_bin, .drop = F) %>%
+  group_by(fishery, size_bin, .drop = F) %>%
   summarise(total = sum(total, na.rm = T)) %>%
-  group_by(opening_year) %>%
+  # pull in missing bins
+  right_join(expand_grid(size_bin = seq(65, 160, by = 5),
+                         fishery = filter(dock, substring(fishery, 1, 2) == "TR") %>% pull(fishery) %>% unique),
+             by = c("fishery", "size_bin")) %>%
+  replace_na(list(total = 0)) %>%
+  f_sdr(., col = "fishery", type = "fishery_code") %>%
+  group_by(opening_year, fishery) %>%
   mutate(prop =  sprintf('%.4f', total / sum(total)),
-         nsamp = min(0.05*sum(total), 100)) %>%
+         nsamp = min(0.05*sum(total), 100),
+         ncrab = sum(total)) %>%
   ungroup() %>%
   # pivot to wide format
   dplyr::select(-total) %>%
-  pivot_wider(names_from = "size_bin", values_from = "prop") %>%
+  pivot_wider(names_from = "size_bin", values_from = "prop", names_sort = T) %>%
   # additional data
   mutate(year = opening_year,
          season = 3, 
@@ -367,10 +385,13 @@ dock %>%
          sex = 1,
          type = 1,
          shell = 0,
-         maturity = 0) %>%
-  dplyr::select(year, season, fleet, sex, type, shell, maturity, nsamp, grep("cl", names(.), value = T)) %>%
-  rbind(c("#year", "season", "fleet", "sex", "type", "shell", "maturity", "nsamp", "datavector", rep(NA, 19)), .) %>%
-  write_delim(here(paste0("bbrkc/output/", season), "item5_directed_fishery_size_comp_retained_males.txt"), delim = "\t", col_names = F, na = "") 
+         maturity = 0,
+         ncrab = paste0("#", ncrab)) %>%
+  dplyr::select(year, season, fleet, sex, type, shell, maturity, nsamp, 
+                grep("\\d", names(.), value = T), ncrab) %>%
+  arrange(year) %>%
+  rbind(c("#year", "season", "fleet", "sex", "type", "shell", "maturity", "nsamp", "datavector", rep(NA, 20)), .) %>%
+  write_delim(here("bbrkc/output", "item5_directed_fishery_size_comp_retained_males.txt"), delim = "\t", col_names = F, na = "") 
   
   
 
@@ -384,21 +405,29 @@ obs_meas %>%
   f_observer_size_comp(by = 2, lump = F) %>%
   # add a column for total, size bin
   mutate(total = rowSums(.[7:ncol(.)]),
-         size_bin = cut(size, 
-                        breaks = c(0, sizebin_vector, Inf),
-                        labels = paste0("cl", seq(67.5, 162.5, 5)))) %>%
+         size_bin = ifelse(size > 160, 160, floor(size/ 5) * 5)) %>%
   # filter for tanner e166 fisheries
   filter(substring(fishery, 1, 2) == "TT") %>%
-  # sum across size bins, normalize to 1 across both sexes
-  group_by(opening_year, sex, size_bin, .drop = F) %>%
+  # sum across size bins
+  group_by(fishery, sex, size_bin, .drop = F) %>%
   summarise(total = sum(total, na.rm = T)) %>%
-  group_by(opening_year) %>%
+  # pull in missing bins
+  full_join(expand_grid(size_bin = seq(65, 160, by = 5),
+                        sex = c("female", "male"),
+                        fishery = filter(obs_meas, substring(fishery, 1, 2) == "TT") %>% pull(fishery) %>% unique),
+             by = c("fishery", "sex", "size_bin")) %>%
+  replace_na(list(total = 0)) %>%
+  # add opening year in again
+  f_sdr(., col = "fishery", type = "fishery_code") %>%
+  # normalise to sum to 1 across both sexes
+  group_by(opening_year, .drop = F) %>%
   mutate(prop =  sprintf('%.4f', total / sum(total)),
-         nsamp = min(0.05*sum(total), 50)) %>%
+         nsamp = min(0.05*sum(total), 50),
+         ncrab = paste0("#", sum(total))) %>%
   ungroup() %>%
   # pivot to wide format
   dplyr::select(-total) %>%
-  pivot_wider(names_from = "size_bin", values_from = "prop") -> tt_size_comp
+  pivot_wider(names_from = "size_bin", values_from = "prop", names_sort = T) -> tt_size_comp
 
 # save male matrix
 tt_size_comp %>%
@@ -411,17 +440,18 @@ tt_size_comp %>%
          type = 0,
          shell = 0,
          maturity = 0) %>%
-  dplyr::select(year, season, fleet, sex, type, shell, maturity, nsamp, grep("cl", names(.), value = T)) %>%
-  rbind(c("#year", "season", "fleet", "sex", "type", "shell", "maturity", "nsamp", "datavector", rep(NA, 19)), .) %>%
-  write_delim(here(paste0("bbrkc/output/", season), "item6a_tanner_e166_size_comp_males.txt"), delim = "\t", col_names = F, na = "")
+  arrange(year) %>%
+  dplyr::select(year, season, fleet, sex, type, shell, maturity, nsamp, grep("\\d", names(.), value = T), ncrab) %>%
+  rbind(c("#year", "season", "fleet", "sex", "type", "shell", "maturity", "nsamp", "datavector", rep(NA, 20)), .) %>%
+  write_delim(here("bbrkc/output", "item6a_tanner_e166_size_comp_males.txt"), delim = "\t", col_names = F, na = "")
 
 # save female matrix
 tt_size_comp %>%
   filter(sex == "female") %>%
   # combine last five bins to one
-  mutate_at(19:23, as.numeric) %>%
-  mutate(cl142.5 =  sprintf('%.4f', cl142.5 + cl147.5 + cl152.5 + cl157.5 + cl162.5)) %>%
-  dplyr::select(-cl147.5, -cl152.5, -cl157.5, -cl162.5) %>%
+  mutate_at(23:27, as.numeric) %>%
+  mutate(`140` =  sprintf('%.4f', `140` + `145` + `150` + `155` + `160`)) %>%
+  dplyr::select(-`145`, -`150`, -`155`, -`160`) %>%
   # additional data
   mutate(year = opening_year,
          season = 5, 
@@ -431,9 +461,10 @@ tt_size_comp %>%
          shell = 0,
          maturity = 0,
          nsamp = 0) %>%
-  dplyr::select(year, season, fleet, sex, type, shell, maturity, nsamp, grep("cl", names(.), value = T)) %>%
-  rbind(c("#year", "season", "fleet", "sex", "type", "shell", "maturity", "nsamp", "datavector", rep(NA, 15)), .) %>%
-  write_delim(here(paste0("bbrkc/output/", season), "item6b_tanner_e166_size_comp_females.txt"), delim = "\t", col_names = F, na = "")
+  arrange(year) %>%
+  dplyr::select(year, season, fleet, sex, type, shell, maturity, nsamp, grep("\\d", names(.), value = T), ncrab) %>%
+  rbind(c("#year", "season", "fleet", "sex", "type", "shell", "maturity", "nsamp", "datavector", rep(NA, 16)), .) %>%
+  write_delim(here("bbrkc/output", "item6b_tanner_e166_size_comp_females.txt"), delim = "\t", col_names = F, na = "")
 
   
   
