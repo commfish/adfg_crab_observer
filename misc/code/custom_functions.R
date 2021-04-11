@@ -78,6 +78,11 @@ f_fish_code_adjust <- function(x, type) {
              # early tanner crab fisheries to QT or TT based on e166 line
              fishery_adj = ifelse((fishery %in% c("EI91", "EI92", paste0("QT", 93:96))), 
                                   paste0("QT", substring(fishery_adj, 3, 4)),
+                                  fishery_adj),
+             # fisheries without any dates in dockside data (make hard change)
+             fishery_adj = ifelse(fishery %in% c("EO91", "EO92"), 
+                                  paste0(substring(fishery_adj, 1, 2), 
+                                         as.numeric(substring(fishery_adj, 3, 4))-1),
                                   fishery_adj)) %>%
       # fishery_adj = ifelse((fishery %in% c("EI91", "EI92", paste0("QT", 93:96)) & (statarea > 660000 | statarea < 0)),
       #                      paste0("QT", substring(fishery_adj, 3, 4)),
@@ -106,6 +111,11 @@ f_fish_code_adjust <- function(x, type) {
              # early tanner crab fisheries to QT or TT based on e166 line
              fishery_adj = ifelse((fishery %in% c("EI89", "EI90", "EI91", "EI92", paste0("QT", 93:96))), 
                                   paste0("QT", substring(fishery_adj, 3, 4)),
+                                  fishery_adj),
+             # fisheries without any dates in dockside data (make hard change)
+             fishery_adj = ifelse(fishery %in% c("EO91", "EO92"), 
+                                  paste0(substring(fishery_adj, 1, 2), 
+                                         as.numeric(substring(fishery_adj, 3, 4))-1),
                                   fishery_adj)) %>%
       #fishery_adj = ifelse((fishery %in% c("EI91", "EI92", paste0("QT", 93:96)) & (statarea > 660000 | statarea < 0)),
       # paste0("QT", substring(fishery_adj, 3, 4)),
