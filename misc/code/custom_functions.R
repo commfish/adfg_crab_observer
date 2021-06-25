@@ -2,7 +2,7 @@
 # functions for preparation of adfg bsai crab fishery data
 
 # author: Tyler Jackson
-# last update: 7/1/2020 (or see most recent commit)
+# last update: 6/25/2021 (or see most recent commit)
 
 
 
@@ -241,7 +241,8 @@ f_sdr <- function(x, col, type){
                                     shell == 2 ~ "new",
                                     shell == 3 ~ "old",
                                     shell == 4 ~ "very_old",
-                                    shell == 5 ~ "very_very_old")) %>%
+                                    shell == 5 ~ "very_very_old",
+                                    shell == -9 ~ "unknown")) %>%
       dplyr::select(-shell) %>%
       bind_cols(x, .) %>%
       dplyr::select(1:grep(col, colnames), shell_text, (grep(col, colnames) + 1):length(colnames)) -> tmp
@@ -362,9 +363,7 @@ f_observer_size_comp <- function(x, by, lump){
   if(by == 2 & missing(lump)){stop("Must provide T/F on whether to lump shell conditions into new/old.")}
   if(by == 2 & lump == F){
     x %>%
-      # no missing shell condition data
-      filter(!is.na(shell),
-             shell != -9) %>%
+      mutate(shell = ifelse(is.na(shell), -9, shell)) %>%
       dplyr::select(fishery, sex, size, shell, legal) %>%
       count(fishery, sex, size, shell) %>%
       rename(count = n) %>%
@@ -373,7 +372,8 @@ f_observer_size_comp <- function(x, by, lump){
       dplyr::select(-sex, -shell) %>%
       pivot_wider(names_from = shell_text, values_from = count) %>%
       replace_na(list(new = 0, new_pliable = 0, soft = 0, old = 0, 
-                      very_old = 0, very_very_old = 0, molting = 0)) %>%
+                      very_old = 0, very_very_old = 0, molting = 0,
+                      unknown = 0)) %>%
       rename(sex = sex_text) %>%
       f_sdr(x =., col = "fishery", type = "fishery_code") %>%
       # reorder the shell conditions
@@ -381,11 +381,10 @@ f_observer_size_comp <- function(x, by, lump){
   }
   if(by == 2 & lump == T){
     x %>%
-      # no missing shell condition data
-      filter(!is.na(shell),
-             shell != -9) %>%
+      mutate(shell = ifelse(is.na(shell), -9, shell)) %>%
       mutate(shell_lump = case_when(shell %in% c(0:2, 9) ~ 2,
-                                    shell %in% c(3:5) ~ 3)) %>%
+                                    shell %in% c(3:5) ~ 3,
+                                    shell == -9 ~ -9)) %>%
       dplyr::select(fishery, sex, size, shell_lump, legal) %>%
       count(fishery, sex, size, shell_lump) %>%
       rename(count = n) %>%
@@ -393,7 +392,7 @@ f_observer_size_comp <- function(x, by, lump){
       f_sdr(x = ., col = "sex", type = "sex") %>%
       dplyr::select(-sex, -shell_lump) %>%
       pivot_wider(names_from = shell_text, values_from = count) %>%
-      replace_na(list(new = 0, old = 0)) %>%
+      replace_na(list(new = 0, old = 0, unknown = 0)) %>%
       rename(sex = sex_text) %>%
       f_sdr(x =., col = "fishery", type = "fishery_code") %>%
       # reorder the shell conditions
@@ -401,9 +400,7 @@ f_observer_size_comp <- function(x, by, lump){
   }
   if(by == 3 & lump == F){
     x %>%
-      # no missing shell condition data
-      filter(!is.na(shell),
-             shell != -9) %>%
+      mutate(shell = ifelse(is.na(shell), -9, shell)) %>%
       dplyr::select(fishery, spcode, sex, size,  shell) %>%
       count(fishery, spcode, sex, size, shell) %>%
       rename(count = n) %>%
@@ -413,7 +410,7 @@ f_observer_size_comp <- function(x, by, lump){
       dplyr::select(-sex, -shell) %>%
       pivot_wider(names_from = shell_text, values_from = count) %>%
       replace_na(list(new = 0, new_pliable = 0, soft = 0, old = 0, 
-                      very_old = 0, very_very_old = 0, molting = 0)) %>%
+                      very_old = 0, very_very_old = 0, molting = 0, unknown = 0)) %>%
       rename(sex = sex_text) %>%
       f_sdr(x =., col = "fishery", type = "fishery_code") %>%
       # reorder the shell conditions
@@ -421,11 +418,10 @@ f_observer_size_comp <- function(x, by, lump){
   }
   if(by == 3 & lump == T){
     x %>%
-      # no missing shell condition data
-      filter(!is.na(shell),
-             shell != -9) %>%
+      mutate(shell = ifelse(is.na(shell), -9, shell)) %>%
       mutate(shell_lump = case_when(shell %in% c(0:2, 9) ~ 2,
-                                    shell %in% c(3:5) ~ 3)) %>%
+                                    shell %in% c(3:5) ~ 3,
+                                    shell == -9 ~ -9)) %>%
       dplyr::select(fishery, spcode, sex, size, shell_lump) %>%
       count(fishery, spcode, sex, size, shell_lump) %>%
       rename(count = n) %>%
@@ -434,7 +430,7 @@ f_observer_size_comp <- function(x, by, lump){
       f_legal_status() %>%
       dplyr::select(-sex, -shell_lump) %>%
       pivot_wider(names_from = shell_text, values_from = count) %>%
-      replace_na(list(new = 0,  old = 0)) %>%
+      replace_na(list(new = 0,  old = 0, unknown = 0)) %>%
       rename(sex = sex_text) %>%
       f_sdr(x =., col = "fishery", type = "fishery_code") %>%
       # reorder the shell conditions

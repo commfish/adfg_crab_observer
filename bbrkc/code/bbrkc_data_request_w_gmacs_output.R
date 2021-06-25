@@ -3,7 +3,7 @@
 ## output files format - gmacs .dat file
 ## prepared by: Tyler Jackson
 ## email: tyler.jackson@alaska.gov
-## last updated: 1/5/2020
+## last updated: 6/25/2021
 
 # load ----
 ## custom functions and libraries
@@ -15,19 +15,19 @@ sizebin_vector <- seq(70, 160, 5)
 # data inputs ----
 
 ## dockside data
-dock <- read_csv(here("bbrkc/data", "RKC-1990-2019_dockside.csv"))
+dock <- read_csv(here("bbrkc/data", "RKC-1990-2020_retained_size_freq.csv"))
 
 ## observer crab detail data
-obs_meas <- read_csv(here("bbrkc/data", "RKC-1990-2019_crab_dump.csv"))
+obs_meas <- read_csv(here("bbrkc/data", "RKC-1990-2020_crab_dump.csv"))
 
 ## count pot data
-pot_sum <- read_csv(here("bbrkc/data", "RKC-1990-2019_potsum.csv"))
+pot_sum <- read_csv(here("bbrkc/data", "RKC-1990-2020_potsum.csv"))
 
 ## fish ticket data by stat area
-ft_files <- list.files(here("misc/data/fish_ticket_summaries"), full.names = T)
-c(lapply(grep(".xlsx", ft_files, value = T), f_read_fish_tick_xlsx),
-  lapply(ft_files[!grepl(".xlsx", ft_files)], f_read_fish_tick_xlsx, format = "old")) %>%
-  do.call("rbind", .) -> fish_tick
+# ft_files <- list.files(here("misc/data/fish_ticket_summaries"), full.names = T)
+# c(lapply(grep(".xlsx", ft_files, value = T), f_read_fish_tick_xlsx),
+#   lapply(ft_files[!grepl(".xlsx", ft_files)], f_read_fish_tick_xlsx, format = "old")) %>%
+#   do.call("rbind", .) -> fish_tick
 
 ## timerseries of directed effort
 dir_effort <- read_csv(here("bbrkc/data", "directed_effort_timeseries_DP.csv"))
@@ -45,15 +45,11 @@ dock %>%
   # combine bbrkc tf and directed fishery, adjust codes for tanner e166 fishery
   mutate(fishery = gsub("XR|CR", "TR", fishery)) -> dock
 
-obs_meas %>%
-  # combine bbrkc tf and directed fishery
-  mutate(fishery = gsub("XR|CR", "TR", fishery)) %>%
-  # filter EI and QT fisheries in early 90s by stat areas e166
-  filter(!(fishery %in% early_90s_tt & (statarea > 660000 | statarea < 0))) %>%
-  # combine all tanner e166 fishery codes
-  mutate(fishery = ifelse(fishery %in% early_90s_tt, gsub("EI|QT", "TT", fishery), fishery)) -> obs_meas
-
 pot_sum %>%
+  # fix biotwine status data
+  mutate(biotwine_ok = case_when(biotwine_ok == "-" ~ NA,
+                                 biotwine_ok %in% c("n", "N") ~ F,
+                                 biotwine_ok %in% c("y", "Y") ~ T)) %>%
   # remove added column start_year
   dplyr::select(-start_year) %>%
   # combine bbrkc tf and directed fishery
@@ -63,21 +59,31 @@ pot_sum %>%
   # combine all tanner e166 fishery codes
   mutate(fishery = ifelse(fishery %in% early_90s_tt, gsub("EI|QT", "TT", fishery), fishery)) -> pot_sum
 
+obs_meas %>%
+  # combine bbrkc tf and directed fishery
+  mutate(fishery = gsub("XR|CR", "TR", fishery)) %>%
+  # filter EI and QT fisheries in early 90s by stat areas e166
+  filter(!(fishery %in% early_90s_tt & (statarea > 660000 | statarea < 0))) %>%
+  # combine all tanner e166 fishery codes
+  mutate(fishery = ifelse(fishery %in% early_90s_tt, gsub("EI|QT", "TT", fishery), fishery)) -> obs_meas
+
 ## summarise fish ticket data by fishery
-fish_tick %>%
-  dplyr::select(-stat_area, -cpue, -avg_wt, -price_lbs) %>%
-  group_by(fishery) %>%
-  summarise_all(sum, na.rm = T) -> fish_tick_summary
+# fish_tick %>%
+#   dplyr::select(-stat_area, -cpue, -avg_wt, -price_lbs) %>%
+#   group_by(fishery) %>%
+#   summarise_all(sum, na.rm = T) -> fish_tick_summary
 
 # item 1 ----
-## total catch of sublegal males and females in the most recent directed 
+## total catch of sublegal males and females
 ## RKC fishery and test fishery
 
 ## get observer measure pot effort 
 pot_sum %>%
   # filter for measured pots in bbrkc directed fisheries
+  # filter out bad biotwine pots
   filter(substring(fishery, 1, 2) == "TR",
-         msr_pot == "Y") %>%
+         msr_pot == "Y",
+         (biotwine_ok == T | is.na(biotwine_ok))) %>%
   group_by(fishery) %>%
   summarise(obs_effort = n()) -> measured_effort
 
@@ -87,6 +93,8 @@ dir_effort %>%
 
 ## get total catch by legal group in numbers
 pot_sum %>%
+  # filter out bad biotwine pots
+  filter((biotwine_ok == T | is.na(biotwine_ok))) %>%
   # get count of female, sublegal and total legal by fishery, total observer pots
   group_by(fishery) %>%
   summarise(female = sum(female, na.rm = T),
@@ -103,6 +111,12 @@ pot_sum %>%
 
 ## extrapolate to weight using observer measure pot and average wt data
 obs_meas %>%
+  # add and filter for biotwine status
+  left_join(pot_sum %>%
+              dplyr::select(fishery, trip, adfg, sampdate, spn, biotwine_ok),
+            by = c("fishery", "trip", "adfg", "sampdate", "spn")) %>%
+  filter((biotwine_ok == T | is.na(biotwine_ok))) %>%
+  # compute average individual weight
   f_average_wt(by = 4, units = "kg") %>%
   # use sex and legal status to assign group
   mutate(group = case_when(sex == 2 & legal_status == F ~ "female",
@@ -163,8 +177,6 @@ dir_catch_est %>%
   rename(`#year` = year) %>%
   write_delim(here("bbrkc/output", "item1b_total_catch_directed_fishery_females.txt"), delim = "\t")
   
-
-
   
 # item 2 ----
 ## number and weight of rkc caught in the directed tanner crab E166
@@ -178,7 +190,8 @@ dir_effort %>%
 ## estimate total bycatch
 pot_sum %>%
   # filter for directed E166 tanner crab fisheries
-  filter(substring(fishery, 1, 2) == "TT") %>%
+  filter(substring(fishery, 1, 2) == "TT",
+         (biotwine_ok == T | is.na(biotwine_ok))) %>%
   # summarise number of crab caught by sex
   group_by(fishery) %>%
   summarise(female = sum(female, na.rm = T),
@@ -190,7 +203,12 @@ pot_sum %>%
   pivot_longer(c(female, male), names_to = "sex_text", values_to = "count") %>%
   mutate(sex = ifelse(sex_text == "male", 1, 2)) %>%
   # join to average weight by fishery and sex
-  left_join(f_average_wt(obs_meas, by = 1, units = "kg"), by = c("fishery", "sex")) %>%
+  left_join(f_average_wt(obs_meas %>%
+                           left_join(pot_sum %>%
+                                       dplyr::select(fishery, trip, adfg, sampdate, spn, biotwine_ok),
+                                     by = c("fishery", "trip", "adfg", "sampdate", "spn")) %>%
+                           filter((biotwine_ok == T | is.na(biotwine_ok))), 
+                         by = 1, units = "kg"), by = c("fishery", "sex")) %>%
   # compute total catch number and weight (t)
   mutate(total_catch_num = (count / obs_effort) * effort,
          total_catch_t = total_catch_num * avg_wt / 1000) %>%
@@ -245,25 +263,31 @@ crab_fishery_bycatch_est %>%
   # comment out years when the fishery is closed
   mutate(potlifts = ifelse(potlifts == 0, 0.0001, potlifts),
          year = ifelse(potlifts == 0.0001, paste0("#", year), year)) %>%
-  write_delim(herepaste0("bbrkc/output", "item2b_tanner_e166_bycatch_female.txt"), delim = "\t")
+  write_delim(here("bbrkc/output", "item2b_tanner_e166_bycatch_female.txt"), delim = "\t")
 
 
 # item 3 ----
 ## fish ticket summary by fishery, TR and XR fisheries separate
-fish_tick_summary %>%
-  # filter for bbrkc directed and cost recovery fishery
-  filter(substring(fishery, 1, 2) %in% c("TR", "XR")) %>%
-  # decihper fishery code and filter for most recent season
-  f_sdr(col = "fishery", type = "fishery_code") %>%
-  filter(opening_year == as.numeric(substring(season, 1, 4))) %>%
-  # save output
-  write_csv(here("bbrkc/output", "item3_fish_ticket_summary.csv"))
+# fish_tick_summary %>%
+#   # filter for bbrkc directed and cost recovery fishery
+#   filter(substring(fishery, 1, 2) %in% c("TR", "XR")) %>%
+#   # decihper fishery code and filter for most recent season
+#   f_sdr(col = "fishery", type = "fishery_code") %>%
+#   filter(opening_year == as.numeric(substring(season, 1, 4))) %>%
+#   # save output
+#   write_csv(here("bbrkc/output", "item3_fish_ticket_summary.csv"))
 
 # item 4 ----
 ## observer size composition, by sex from bbrkc directed fishery
 
 ## total males
 obs_meas %>%
+  # remove failed biotwine pots
+  left_join(pot_sum %>%
+              dplyr::select(fishery, trip, adfg, sampdate, spn, biotwine_ok),
+            by = c("fishery", "trip", "adfg", "sampdate", "spn")) %>%
+  filter((biotwine_ok == T | is.na(biotwine_ok))) %>%
+  # filter males of appropriate size
   filter(sex == 1, 
          legal %in% c(0, 1, 2, 3, 6),
          size >= 65) %>%
@@ -278,7 +302,8 @@ obs_meas %>%
   summarise(total = sum(total, na.rm = T)) %>%
   # pull in missing bins
   full_join(expand_grid(size_bin = seq(65, 160, by = 5),
-                        fishery = filter(obs_meas, substring(fishery, 1, 2) == "TR") %>% pull(fishery) %>% unique),
+                        fishery = filter(obs_meas, substring(fishery, 1, 2) == "TR") %>% 
+                          pull(fishery) %>% unique),
             by = c("fishery", "size_bin")) %>%
   replace_na(list(total = 0)) %>%
   # add opening year in again
@@ -308,6 +333,12 @@ obs_meas %>%
 
 ## total females
 obs_meas %>%
+  # remove failed biotwine pots
+  left_join(pot_sum %>%
+              dplyr::select(fishery, trip, adfg, sampdate, spn, biotwine_ok),
+            by = c("fishery", "trip", "adfg", "sampdate", "spn")) %>%
+  filter((biotwine_ok == T | is.na(biotwine_ok))) %>%
+  # filter females of appropriate size
   filter(sex == 2,
          size >= 65) %>%
   f_observer_size_comp(by = 2, lump = F) %>%
@@ -399,7 +430,12 @@ dock %>%
 # item 6 ----
 ## observer size composition, by legal status and shell condition from tanner crab e166 fishery
 obs_meas %>%
-  filter(legal %in% c(-7, 0, 1, 2, 3, 6),
+  # remove failed biotwine pots
+  left_join(pot_sum %>%
+              dplyr::select(fishery, trip, adfg, sampdate, spn, biotwine_ok),
+            by = c("fishery", "trip", "adfg", "sampdate", "spn")) %>%
+  filter((biotwine_ok == T | is.na(biotwine_ok)),
+         legal %in% c(-7, 0, 1, 2, 3, 6),
          substring(fishery, 1, 2) == "TT",
          size >= 65) %>%
   f_observer_size_comp(by = 2, lump = F) %>%
