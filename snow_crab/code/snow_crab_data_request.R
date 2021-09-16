@@ -2,7 +2,7 @@
 ## fishery data request - snow crab
 ## prepared by: Tyler Jackson
 ## email: tyler.jackson@alaska.gov
-## last updated: 3/8/2020
+## last updated: 9/16/2021
 
 
 # load ----
@@ -12,13 +12,13 @@ source("./misc/code/custom_functions.R")
 # data inputs ----
 
 ## dockside data
-dock <- read_csv("./snow_crab/data/SNOWCRAB-1990-2019_dockside.csv")
+dock <- read_csv("./snow_crab/data/SNOWCRAB-1990-2020_retained_size_freq.csv")
 
 ## observer crab detail data
-obs_meas <- read_csv("./snow_crab/data/SNOWCRAB-1990-2019_crab_dump.csv")
+obs_meas <- read_csv("./snow_crab/data/SNOWCRAB-1990-2020_crab_dump.csv")
 
 ## count pot data
-pot_sum <- read_csv("./snow_crab/data/SNOWCRAB-1990-2019_potsum.csv")
+pot_sum <- read_csv("./snow_crab/data/SNOWCRAB-1990-2020_potsum.csv")
 
 ## stat area fish ticket summary for all fisheries directed catch
 #fish_tick <- read_csv("./snow_crab/data/bsai_crab_fish_ticket_summary_stat_area.csv")
