@@ -104,18 +104,18 @@ pot_sum %>%
   # pivot to long format
   pivot_longer(c(female, sublegal, tot_legal), names_to = "group", values_to = "count") %>%
   # join to directed fishery effort
-  left_join(directed_effort, by = "fishery") %>%
+  left_join(directed_effort, by = "fishery") %>% 
   # compute total catch
   group_by(fishery, group) %>%
   summarise(total_catch_num = (count / obs_effort) * effort) -> total_catch_num
 
 ## extrapolate to weight using observer measure pot and average wt data
 obs_meas %>%
-  # add and filter for biotwine status
-  left_join(pot_sum %>%
-              dplyr::select(fishery, trip, adfg, sampdate, spn, biotwine_ok),
-            by = c("fishery", "trip", "adfg", "sampdate", "spn")) %>%
-  filter((biotwine_ok == T | is.na(biotwine_ok))) %>%
+  # # add and filter for biotwine status
+  # left_join(pot_sum %>%
+  #             dplyr::select(fishery, trip, adfg, sampdate, spn),
+  #           by = c("fishery", "trip", "adfg", "sampdate", "spn")) %>%
+  filter((biotwine_ok %in% c("Y", "-") | is.na(biotwine_ok))) %>%
   # compute average individual weight
   f_average_wt(by = 4, units = "kg") %>%
   # use sex and legal status to assign group
@@ -139,7 +139,7 @@ obs_meas %>%
 dir_catch_est %>%
   filter(group %in% c("sublegal", "tot_legal")) %>%
   group_by(opening_year) %>%
-  summarise(obs = sprintf('%.1f', sum(total_catch_t))) %>%
+  summarise(obs = sprintf('%.1f', sum(total_catch_t))) %>% 
   # add columsn required by gmacs
   mutate(year = opening_year, 
          season = 3, 
@@ -204,10 +204,10 @@ pot_sum %>%
   mutate(sex = ifelse(sex_text == "male", 1, 2)) %>%
   # join to average weight by fishery and sex
   left_join(f_average_wt(obs_meas %>%
-                           left_join(pot_sum %>%
-                                       dplyr::select(fishery, trip, adfg, sampdate, spn, biotwine_ok),
-                                     by = c("fishery", "trip", "adfg", "sampdate", "spn")) %>%
-                           filter((biotwine_ok == T | is.na(biotwine_ok))), 
+                           # left_join(pot_sum %>%
+                           #             dplyr::select(fishery, trip, adfg, sampdate, spn),
+                           #           by = c("fishery", "trip", "adfg", "sampdate", "spn")) %>%
+                           filter((biotwine_ok %in% c("Y", "-") | is.na(biotwine_ok))), 
                          by = 1, units = "kg"), by = c("fishery", "sex")) %>%
   # compute total catch number and weight (t)
   mutate(total_catch_num = (count / obs_effort) * effort,
@@ -282,11 +282,11 @@ crab_fishery_bycatch_est %>%
 
 ## total males
 obs_meas %>%
-  # remove failed biotwine pots
-  left_join(pot_sum %>%
-              dplyr::select(fishery, trip, adfg, sampdate, spn, biotwine_ok),
-            by = c("fishery", "trip", "adfg", "sampdate", "spn")) %>%
-  filter((biotwine_ok == T | is.na(biotwine_ok))) %>%
+  # # remove failed biotwine pots
+  # left_join(pot_sum %>%
+  #             dplyr::select(fishery, trip, adfg, sampdate, spn),
+  #           by = c("fishery", "trip", "adfg", "sampdate", "spn")) %>%
+  filter((biotwine_ok %in% c("Y", "-") | is.na(biotwine_ok))) %>%
   # filter males of appropriate size
   filter(sex == 1, 
          legal %in% c(0, 1, 2, 3, 6),
@@ -333,11 +333,11 @@ obs_meas %>%
 
 ## total females
 obs_meas %>%
-  # remove failed biotwine pots
-  left_join(pot_sum %>%
-              dplyr::select(fishery, trip, adfg, sampdate, spn, biotwine_ok),
-            by = c("fishery", "trip", "adfg", "sampdate", "spn")) %>%
-  filter((biotwine_ok == T | is.na(biotwine_ok))) %>%
+  # # remove failed biotwine pots
+  # left_join(pot_sum %>%
+  #             dplyr::select(fishery, trip, adfg, sampdate, spn, biotwine_ok),
+  #           by = c("fishery", "trip", "adfg", "sampdate", "spn")) %>%
+  filter((biotwine_ok %in% c("Y", "-") | is.na(biotwine_ok))) %>%
   # filter females of appropriate size
   filter(sex == 2,
          size >= 65) %>%
@@ -430,11 +430,11 @@ dock %>%
 # item 6 ----
 ## observer size composition, by legal status and shell condition from tanner crab e166 fishery
 obs_meas %>%
-  # remove failed biotwine pots
-  left_join(pot_sum %>%
-              dplyr::select(fishery, trip, adfg, sampdate, spn, biotwine_ok),
-            by = c("fishery", "trip", "adfg", "sampdate", "spn")) %>%
-  filter((biotwine_ok == T | is.na(biotwine_ok)),
+  # # remove failed biotwine pots
+  # left_join(pot_sum %>%
+  #             dplyr::select(fishery, trip, adfg, sampdate, spn, biotwine_ok),
+  #           by = c("fishery", "trip", "adfg", "sampdate", "spn")) %>%
+  filter((biotwine_ok %in% c("Y", "-") | is.na(biotwine_ok)),
          legal %in% c(-7, 0, 1, 2, 3, 6),
          substring(fishery, 1, 2) == "TT",
          size >= 65) %>%
