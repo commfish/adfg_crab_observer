@@ -607,61 +607,53 @@ f_stat_week <- function(x){
   
 }
 
-# f_read_fish_tick_xlsx ----
-# read excel sheet fish ticket reports by stat_area provided by Dutch Harbor ADF&G
-# args: path - file path to excel document
+# f_unpack_fish_ticket_summary ----
+# read and combine excel sheet fish ticket reports by statarea provided by Dutch Harbor ADF&G
+# args: dir - path to directory with Excel files
 
-f_read_fish_tick_xlsx <- function(path, format = "new") {
+f_unpack_fish_ticket_summary <- function(dir) { 
   
-  ## function to map across sheets for cleaning up data
-  f_ft_clean <- function(x) {
-    if(nrow(x) > 0){
-      row_num <- grep("Total", pull(x, 1))
-      x %>%
-        slice(-c(row_num:nrow(x))) %>%
-        mutate_all(as.character())
-    }
-  }
+  # list file names
+  tibble(file = list.files(dir, full.names = T)) %>%
+    # extract fishery sheets
+    mutate(fishery = purrr::map(file, excel_sheets)) %>%
+    unnest(fishery)  %>%
+    # unpack sheets
+    mutate(data = purrr::map2(file, fishery, function(file, fishery) {
+      
+      # read data
+      read_excel(file, sheet = fishery) -> out
+      
+      # if there is data, retain only data contains rows of excel sheet, fix names
+      if(nrow(out) > 0 & ncol(out) == 11) {
+        out %>%
+          rename_at(1, ~"v1") %>%
+          filter(str_count(v1, "[0-9]") == 6) %>%
+          rename_all(~c("stat_area", "vessels", "landings", "live_number", "live_lbs", "deadloss_number", "deadloss_lbs", "pots", "cpue", "avg_wt", "price_per_lb")) -> out
+      }
+      
+      if(nrow(out) > 0 & ncol(out) == 10) {
+        out %>%
+          rename_at(1, ~"v1") %>%
+          filter(str_count(v1, "[0-9]") == 6) %>%
+          rename_all(~c("stat_area", "vessels", "live_number", "live_lbs", "deadloss_number", "deadloss_lbs", "pots", "cpue", "avg_wt", "price_per_lb")) -> out
+      }
+      # if there is no data, make a missing data row
+      if(nrow(out) >= 0 & ncol(out) < 10) {
+        matrix(ncol = 11, nrow = 1) %>%
+          as_tibble(.name_repair = "unique") %>%
+          rename_all(~c("stat_area", "vessels", "landings", "live_number", "live_lbs", "deadloss_number", "deadloss_lbs", "pots", "cpue", "avg_wt", "price_per_lb")) -> out
+      }
+      
+      return(out)
+      
+    })) %>%
+    unnest(data) %>%
+    dplyr::select(-file) %>%
+    mutate_at(3:ncol(.), as.numeric) -> x
   
-  if(format == "new"){
-    suppressWarnings( 
-      tibble(fishery = excel_sheets(path),
-             xl_list = lapply(excel_sheets(path), function(x) read_excel(path = path, sheet = x, skip = 2, col_types = "text"))) %>%
-        mutate(n_row = purrr::map_dbl(xl_list, nrow),
-               xl_list = purrr::map(xl_list, f_ft_clean)) %>%
-        # filter data for only single fisheries that have data (assuming 4 char is fishery code)
-        filter(nchar(fishery, type = "chars") == 4, 
-               n_row > 0) %>%
-        dplyr::select(-n_row) %>%
-        unnest(xl_list) %>%
-        # rename columns
-        rename_all(~c("fishery", "stat_area", "vessels", "landings", "live_number", "live_lbs", "deadloss_number", "deadloss_lbs", "effort", "cpue", "avg_wt", "price_lbs")) %>%
-        # fix column class
-        mutate_at(3:12, as.numeric)
-    ) -> tmp
-  }
+  return(x)
   
-  
-  if(format == "old"){
-    suppressWarnings( 
-    tibble(fishery = excel_sheets(path),
-           xl_list = lapply(excel_sheets(path), function(x) read_excel(path = path, sheet = x, skip = 11, col_types = "text"))) %>%
-      mutate(n_row = purrr::map_dbl(xl_list, nrow),
-             xl_list = purrr::map(xl_list, f_ft_clean)) %>%
-      # filter data for only single fisheries that have data (assuming 4 char is fishery code)
-      filter(nchar(fishery, type = "chars") == 4, 
-             n_row > 0) %>%
-      dplyr::select(-n_row) %>%
-      unnest(xl_list) %>%
-      # rename columns
-      rename_all(~c("fishery", "stat_area", "vessels", "landings", "live_number", "live_lbs", "deadloss_number", "deadloss_lbs", "effort", "cpue", "avg_wt", "price_lbs")) %>%
-      # remove blank rows
-      filter(!is.na(stat_area)) %>%
-      # fix column class
-      mutate_at(3:12, as.numeric)
-    ) -> tmp
-  }
-  tmp
 }
 
   

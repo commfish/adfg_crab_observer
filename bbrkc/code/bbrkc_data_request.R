@@ -14,19 +14,16 @@ season <- "2019_20"
 # data inputs ----
 
 ## dockside data
-dock <- read_csv(here("bbrkc/data", "RKC-1990-2019_dockside.csv"))
+dock <- read_csv(here("bbrkc/data", "RKC-1990-2020_retained_size_freq.csv"))
 
 ## observer crab detail data
-obs_meas <- read_csv(here("bbrkc/data", "RKC-1990-2019_crab_dump.csv"))
+obs_meas <- read_csv(here("bbrkc/data", "RKC-1990-2020_crab_dump.csv"))
 
 ## count pot data
-pot_sum <- read_csv(here("bbrkc/data", "RKC-1990-2019_potsum.csv"))
+pot_sum <- read_csv(here("bbrkc/data", "RKC-1990-2020_potsum.csv"))
 
-## fish ticket data by stat area
-ft_files <- list.files(here("misc/data/fish_ticket_summaries"), full.names = T)
-c(lapply(grep(".xlsx", ft_files, value = T), f_read_fish_tick_xlsx),
-  lapply(ft_files[!grepl(".xlsx", ft_files)], f_read_fish_tick_xlsx, format = "old")) %>%
-  do.call("rbind", .) -> fish_tick
+## fish tickets by stat area
+ft <- f_unpack_fish_ticket_summary("./misc/data/fish_ticket_summaries")
 
 ## timerseries of directed effort
 dir_effort <- read_csv(here("bbrkc/data", "directed_effort_timeseries_DP.csv"))
@@ -120,7 +117,7 @@ obs_meas %>%
   dplyr::select(-avg_wt, -sex) %>%
   filter(!is.na(group)) %>%
   arrange(opening_year) %>%
-  write_csv(here(paste0("bbrkc/output/", season), "item1_total_catch_directed_fishery.csv"))
+  write_csv("bbrkc/output/item1_total_catch_directed_fishery_table.csv")
   
 # item 2 ----
 ## number and weight of rkc caught in the directed tanner crab E166
@@ -159,19 +156,20 @@ pot_sum %>%
   f_sdr(col = "fishery", type = "fishery_code") %>%
   arrange(opening_year) %>%
   # save output
-  write_csv(here(paste0("bbrkc/output/", season), "item2_total_catch_tanner_crab_e166.csv"))
+  write_csv("bbrkc/output/item2_total_catch_tanner_crab_e166_table.csv")
   
 
 # item 3 ----
-## fish ticket summary by fishery, TR and XR fisheries separate
-fish_tick_summary %>%
-  # filter for bbrkc directed and cost recovery fishery
-  filter(substring(fishery, 1, 2) %in% c("TR", "XR")) %>%
-  # decihper fishery code
-  f_sdr(col = "fishery", type = "fishery_code") %>%
-  # save output
-  write_csv(here(paste0("bbrkc/output/", season), "item3_fish_ticket_summary.csv"))
 
+# timeseries of retained catch in numbers and weight for TR and XR fisheries
+ft %>%
+  filter(substring(fishery, 1, 2) %in% c("TR", "XR")) %>%
+  f_sdr(col = "fishery", type = "fishery_code") %>%
+  group_by(opening_year) %>%
+  summarize(retained_number = sum(live_number, na.rm = T) + sum(deadloss_number, na.rm = T),
+            retained_lbs = sum(live_lbs, na.rm = T) + sum(deadloss_lbs, na.rm = T),
+            retained_t = retained_lbs * 0.000453592) %>%
+  write_csv("bbrkc/output/item3_retained_catch_table.csv")
 
 # item 4 ----
 ## observer size composition, by legal status and shell condition from bbrkc directed fishery
@@ -185,7 +183,7 @@ obs_meas %>%
   # filter for directed fishery
   filter(substring(fishery, 1, 2) == "TR") %>%
   # save output
-  write_csv(here(paste0("bbrkc/output/", season), "item4a_sublegal_observer_size_comp_directed_fishery.csv"))
+  write_csv("bbrkc/output/item4a_sublegal_observer_size_comp_directed_fishery_table.csv")
 
 ## all legal males by shell condition
 obs_meas %>%
@@ -196,7 +194,7 @@ obs_meas %>%
   # filter for directed fishery
   filter(substring(fishery, 1, 2) == "TR") %>%
   # save output
-  write_csv(here(paste0("bbrkc/output/", season), "item4b_legal_observer_size_comp_directed_fishery.csv"))
+  write_csv("bbrkc/output/item4b_legal_observer_size_comp_directed_fishery_table.csv")
 
 ## females by shell condition
 obs_meas %>%
@@ -207,7 +205,7 @@ obs_meas %>%
   # filter for directed fishery
   filter(substring(fishery, 1, 2) == "TR") %>%
   # save output
-  write_csv(here(paste0("bbrkc/output/", season), "item4c_female_observer_size_comp_directed_fishery.csv"))
+  write_csv("bbrkc/output/item4c_female_observer_size_comp_directed_fishery_table.csv")
 
 # item 5 ----
 ## size composition of landed catch (dockside sampling) in directed fishery
@@ -219,7 +217,7 @@ dock %>%
   # filter for directed fishery
   filter(substring(fishery, 1, 2) == "TR") %>%
   # save output
-  write_csv(here(paste0("bbrkc/output/", season), "item5_retained_size_comp.csv"))
+  write_csv("bbrkc/output/item5_retained_size_comp_table.csv")
   
   
 
@@ -235,7 +233,7 @@ obs_meas %>%
   # add a column for total
   mutate(total = rowSums(.[7:ncol(.)])) %>%
   # save output
-  write_csv(here(paste0("bbrkc/output/", season), "item6a_sublegal_observer_size_comp_tanner_e166_fishery.csv"))
+  write_csv("bbrkc/output/item6a_sublegal_observer_size_comp_tanner_e166_fishery_table.csv")
 
 ## all legal males by shell condition
 obs_meas %>%
@@ -246,7 +244,7 @@ obs_meas %>%
   # add a column for total
   mutate(total = rowSums(.[7:ncol(.)])) %>%
   # save output
-  write_csv(here(paste0("bbrkc/output/", season), "item6b_legal_observer_size_comp_tanner_e166_fishery.csv"))
+  write_csv("bbrkc/output/item6b_legal_observer_size_comp_tanner_e166_fishery_table.csv")
 
 ## females by shell condition
 obs_meas %>%
@@ -257,4 +255,4 @@ obs_meas %>%
   # add a column for total
   mutate(total = rowSums(.[7:ncol(.)])) %>%
   # save output
-  write_csv(here(paste0("bbrkc/output/", season), "item6c_female_observer_size_comp_tanner_e166_fishery.csv"))
+  write_csv("bbrkc/output/item6c_female_observer_size_comp_tanner_e166_fishery_table.csv")
