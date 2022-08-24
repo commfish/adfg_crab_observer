@@ -50,8 +50,6 @@ obs_meas %>%
   mutate(fishery = ifelse(fishery %in% early_90s_tt, gsub("EI|QT", "TT", fishery), fishery)) -> obs_meas
 
 pot_sum %>%
-  # remove added column start_year
-  dplyr::select(-start_year) %>%
   # combine bbrkc tf and directed fishery
   mutate(fishery = gsub("XR|CR", "TR", fishery)) %>%
   # filter EI and QT fisheries in early 90s by stat areas e166
@@ -60,8 +58,8 @@ pot_sum %>%
   mutate(fishery = ifelse(fishery %in% early_90s_tt, gsub("EI|QT", "TT", fishery), fishery)) -> pot_sum
 
 ## summarise fish ticket data by fishery
-fish_tick %>%
-  dplyr::select(-stat_area, -cpue, -avg_wt, -price_lbs) %>%
+ft %>%
+  dplyr::select(-stat_area, -cpue, -avg_wt, -price_per_lb) %>%
   group_by(fishery) %>%
   summarise_all(sum, na.rm = T) -> fish_tick_summary
 
@@ -86,17 +84,21 @@ dir_effort %>%
 pot_sum %>%
   # get count of female, sublegal and total legal by fishery, total observer pots
   group_by(fishery) %>%
-  summarise(female = sum(female, na.rm = T),
-            sublegal = sum(sublegal, na.rm = T), 
-            tot_legal = sum(tot_legal, na.rm = T),
+  summarise(female = paste(sum(female, na.rm = T), var(female) / n()),
+            sublegal = paste(sum(sublegal, na.rm = T), var(sublegal) / n()),
+            tot_legal = paste(sum(tot_legal, na.rm = T), var(tot_legal) / n()),
             obs_effort = n()) %>%
   # pivot to long format
   pivot_longer(c(female, sublegal, tot_legal), names_to = "group", values_to = "count") %>%
+  separate(count, into = c("count", "var"), convert = T, sep = " ") %>%
   # join to directed fishery effort
   left_join(directed_effort, by = "fishery") %>%
   # compute total catch
   group_by(fishery, group) %>%
-  summarise(total_catch_num = (count / obs_effort) * effort) -> total_catch_num
+  summarise(total_catch_num = (count / obs_effort) * effort,
+            total_catch_se = sqrt(var * effort^2),
+            total_catch_cv = total_catch_se / total_catch_num) %>%
+  ungroup -> total_catch_num
 
 ## extrapolate to weight using observer measure pot and average wt data
 obs_meas %>%
