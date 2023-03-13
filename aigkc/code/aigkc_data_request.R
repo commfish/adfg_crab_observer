@@ -126,7 +126,7 @@ dock %>%
   # filter for directed fishery
   filter(substring(fishery, 1, 2) %in% c("OB", "RB")) %>%
   # save output
-  write_csv("bbrkc/output/item3_retained_size_comp.csv")
+  write_csv("aigkc/output/item3_retained_size_comp.csv")
 
 
 # item 4 (observer size composition) ----
@@ -139,4 +139,4 @@ obs_meas %>%
   # filter for directed fishery
   filter(substring(fishery, 1, 2) %in% c("OB", "RB")) %>%
   # save output
-write_csv("bbrkc/output/item4_directed_total_size_comp.csv")
+write_csv("aigkc/output/item4_directed_total_size_comp.csv")
