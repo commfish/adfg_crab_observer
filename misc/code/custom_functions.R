@@ -11,6 +11,7 @@ if (!require("tidyverse", quiet = T)) {install.packages("tidyverse"); library(ti
 if (!require("lubridate", quiet = T)) {install.packages("lubridate"); library(lubridate)}
 if (!require("here", quiet = T)) {install.packages("here"); library(here)}
 if (!require("readxl", quiet = T)) {install.packages("readxl"); library(readxl)}
+if (!require("modi", quiet = T)) {install.packages("modi"); library(modi)}
 
 # background data for shell condition ----
 ## shell condition levels
@@ -39,9 +40,9 @@ tibble(code_3 = sprintf("%02d", 0:99),
 params <- read_csv(here::here("misc/data", "weight_parameters.csv"))
 
 # background data for f_legal_status ----
-tibble(spcode = c(932, 931, 931, 921),
-       fishery_area = c(NA, "E166", "W166", NA),
-       legal_size_mm = c(78, 121, 111, 135)) -> legal_size
+tibble(spcode = c(932, 931, 931, 921, 923),
+       fishery_area = c(NA, "E166", "W166", NA, NA),
+       legal_size_mm = c(78, 121, 111, 135, 124)) -> legal_size
 
 # f_fish_code_adjust ----
 f_fish_code_adjust <- function(x, type) {
@@ -474,11 +475,12 @@ f_average_wt <- function(x, by, legal_code = T, units = "kg"){
       count(fishery, sex, spcode, size, maturity) %>%
       rename(count = n) %>%
       # join to growth parameters
-      left_join(params, by = c("sex", "spcode", "maturity")) %>%
+      left_join(params, by = c("sex", "spcode", "maturity", "stock")) %>%
       # estimate calculated weight
       mutate(calc_wt_kg = (alpha * as.numeric(size)^beta) / 1000) %>%
       group_by(fishery, sex) %>%
-      summarise(avg_wt = weighted.mean(calc_wt_kg, w = count)) -> tmp
+      summarise(avg_wt = weighted.mean(calc_wt_kg, w = count),
+                avg_wt_var = modi::weighted.var(calc_wt_kg, w = count) / sum(count)) -> tmp
   }
   if(by == 2){
     x %>%
@@ -492,11 +494,12 @@ f_average_wt <- function(x, by, legal_code = T, units = "kg"){
       count(fishery, sex, spcode, size, shell_lump, maturity) %>%
       rename(count = n) %>%
       # join to growth parameters
-      left_join(params, by = c("sex", "spcode", "maturity")) %>%
+      left_join(params, by = c("sex", "spcode", "maturity", "stock")) %>%
       # estimate calculated weight
       mutate(calc_wt_kg = (alpha * as.numeric(size)^beta) / 1000) %>%
       group_by(fishery, sex, shell_lump) %>%
-      summarise(avg_wt = weighted.mean(calc_wt_kg, w = count)) -> tmp
+      summarise(avg_wt = weighted.mean(calc_wt_kg, w = count),
+                avg_wt_var = modi::weighted.var(calc_wt_kg, w = count) / sum(count)) -> tmp
   }
   if(by == 3){
     if(legal_code == T){
@@ -516,11 +519,12 @@ f_average_wt <- function(x, by, legal_code = T, units = "kg"){
         count(fishery, sex, spcode, size, shell_lump, maturity, legal_status) %>%
         rename(count = n) %>%
         # join to growth parameters
-        left_join(params, by = c("sex", "spcode", "maturity")) %>%
+        left_join(params, by = c("sex", "spcode", "maturity", "stock")) %>%
         # estimate calculated weight
         mutate(calc_wt_kg = (alpha * as.numeric(size)^beta) / 1000) %>%
         group_by(fishery, sex, shell_lump, legal_status) %>%
-        summarise(avg_wt = weighted.mean(calc_wt_kg, w = count)) %>%
+        summarise(avg_wt = weighted.mean(calc_wt_kg, w = count),
+                  avg_wt_var = modi::weighted.var(calc_wt_kg, w = count) / sum(count)) %>%
         mutate(legal_status = legal_status == 1) -> tmp
     }
     if(legal_code == F){
@@ -536,11 +540,12 @@ f_average_wt <- function(x, by, legal_code = T, units = "kg"){
         count(fishery, sex, spcode, size, shell_lump, maturity, legal_status) %>%
         rename(count = n) %>%
         # join to growth parameters
-        left_join(params, by = c("sex", "spcode", "maturity")) %>%
+        left_join(params, by = c("sex", "spcode", "maturity", "stock")) %>%
         # estimate calculated weight
         mutate(calc_wt_kg = (alpha * as.numeric(size)^beta) / 1000) %>%
         group_by(fishery, sex, shell_lump, legal_status) %>%
-        summarise(avg_wt = weighted.mean(calc_wt_kg, w = count)) -> tmp
+        summarise(avg_wt = weighted.mean(calc_wt_kg, w = count),
+                  avg_wt_var = modi::weighted.var(calc_wt_kg, w = count) / sum(count)) -> tmp
     }
   }
   
@@ -553,16 +558,17 @@ f_average_wt <- function(x, by, legal_code = T, units = "kg"){
         # fix legal designation
         mutate(legal_status = case_when(legal %in% c(0, -7) ~ 0,
                                         legal %in% 1:6 ~ 1),
-               legal_status = ifelse(legal_status == -9, NA, legal_status),) %>%
+               legal_status = ifelse(legal_status == -9, NA, legal_status)) %>%
         filter(!is.na(legal_status)) %>%
         count(fishery, sex, spcode, size, maturity, legal_status) %>%
         rename(count = n) %>%
         # join to growth parameters
-        left_join(params, by = c("sex", "spcode", "maturity")) %>%
+        left_join(params, by = c("sex", "spcode", "maturity", "stock")) %>% 
         # estimate calculated weight
         mutate(calc_wt_kg = (alpha * as.numeric(size)^beta) / 1000) %>%
         group_by(fishery, sex, legal_status) %>%
-        summarise(avg_wt = weighted.mean(calc_wt_kg, w = count)) -> tmp
+        summarise(avg_wt = weighted.mean(calc_wt_kg, w = count),
+                  avg_wt_var = modi::weighted.var(calc_wt_kg, w = count) / sum(count)) -> tmp
     }
     if(legal_code == F){
       x %>%
@@ -573,15 +579,17 @@ f_average_wt <- function(x, by, legal_code = T, units = "kg"){
         count(fishery, sex, spcode, size, maturity, legal_status) %>%
         rename(count = n) %>%
         # join to growth parameters
-        left_join(params, by = c("sex", "spcode", "maturity")) %>%
+        left_join(params, by = c("sex", "spcode", "maturity", "stock")) %>%
         # estimate calculated weight
         mutate(calc_wt_kg = (alpha * as.numeric(size)^beta) / 1000) %>%
         group_by(fishery, sex, legal_status) %>%
-        summarise(avg_wt = weighted.mean(calc_wt_kg, w = count)) -> tmp
+        summarise(avg_wt = weighted.mean(calc_wt_kg, w = count),
+                  avg_wt_var = modi::weighted.var(calc_wt_kg, w = count) / sum(count)) -> tmp
     }
   }
   if(units == "lbs"){
     tmp$avg_wt <- tmp$avg_wt * 2.2046226218
+    tmp$avg_wt_var <- tmp$avg_wt_var * 2.2046226218^2
   }
   tmp
 }
@@ -629,20 +637,23 @@ f_unpack_fish_ticket_summary <- function(dir) {
         out %>%
           rename_at(1, ~"v1") %>%
           filter(str_count(v1, "[0-9]") == 6) %>%
-          rename_all(~c("stat_area", "vessels", "landings", "live_number", "live_lbs", "deadloss_number", "deadloss_lbs", "pots", "cpue", "avg_wt", "price_per_lb")) -> out
+          rename_all(~c("stat_area", "vessels", "landings", "live_number", "live_lbs", "deadloss_number", "deadloss_lbs", "pots", "cpue", "avg_wt", "price_per_lb")) %>%
+          mutate_all(., as.numeric) -> out
       }
       
       if(nrow(out) > 0 & ncol(out) == 10) {
         out %>%
           rename_at(1, ~"v1") %>%
           filter(str_count(v1, "[0-9]") == 6) %>%
-          rename_all(~c("stat_area", "vessels", "live_number", "live_lbs", "deadloss_number", "deadloss_lbs", "pots", "cpue", "avg_wt", "price_per_lb")) -> out
+          rename_all(~c("stat_area", "vessels", "live_number", "live_lbs", "deadloss_number", "deadloss_lbs", "pots", "cpue", "avg_wt", "price_per_lb")) %>%
+          mutate_all(., as.numeric) -> out
       }
       # if there is no data, make a missing data row
       if(nrow(out) >= 0 & ncol(out) < 10) {
         matrix(ncol = 11, nrow = 1) %>%
           as_tibble(.name_repair = "unique") %>%
-          rename_all(~c("stat_area", "vessels", "landings", "live_number", "live_lbs", "deadloss_number", "deadloss_lbs", "pots", "cpue", "avg_wt", "price_per_lb")) -> out
+          rename_all(~c("stat_area", "vessels", "landings", "live_number", "live_lbs", "deadloss_number", "deadloss_lbs", "pots", "cpue", "avg_wt", "price_per_lb")) %>%
+          mutate_all(., as.numeric) -> out
       }
       
       return(out)
