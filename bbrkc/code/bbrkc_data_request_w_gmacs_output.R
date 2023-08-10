@@ -15,19 +15,16 @@ sizebin_vector <- seq(70, 160, 5)
 # data inputs ----
 
 ## dockside data
-dock <- read_csv(here("bbrkc/data", "RKC-1990-2020_retained_size_freq.csv"))
+dock <- read_csv(here("bbrkc/data", "RKC-1990-2022_retained_size_freq.csv"))
 
 ## observer crab detail data
-obs_meas <- read_csv(here("bbrkc/data", "RKC-1990-2020_crab_dump.csv"))
+obs_meas <- read_csv(here("bbrkc/data", "RKC-1990-2022_crab_dump.csv"))
 
 ## count pot data
-pot_sum <- read_csv(here("bbrkc/data", "RKC-1990-2020_potsum.csv"))
+pot_sum <- read_csv(here("bbrkc/data", "RKC-1990-2022_potsum.csv"))
 
-## fish ticket data by stat area
-# ft_files <- list.files(here("misc/data/fish_ticket_summaries"), full.names = T)
-# c(lapply(grep(".xlsx", ft_files, value = T), f_read_fish_tick_xlsx),
-#   lapply(ft_files[!grepl(".xlsx", ft_files)], f_read_fish_tick_xlsx, format = "old")) %>%
-#   do.call("rbind", .) -> fish_tick
+## fish ticket data 
+ft <- f_unpack_fish_ticket_summary("./misc/data/fish_ticket_summaries")
 
 ## timerseries of directed effort
 dir_effort <- read_csv(here("bbrkc/data", "directed_effort_timeseries_DP.csv"))
@@ -67,12 +64,6 @@ obs_meas %>%
   # combine all tanner e166 fishery codes
   mutate(fishery = ifelse(fishery %in% early_90s_tt, gsub("EI|QT", "TT", fishery), fishery)) -> obs_meas
 
-## summarise fish ticket data by fishery
-# fish_tick %>%
-#   dplyr::select(-stat_area, -cpue, -avg_wt, -price_lbs) %>%
-#   group_by(fishery) %>%
-#   summarise_all(sum, na.rm = T) -> fish_tick_summary
-
 # item 1 ----
 ## total catch of sublegal males and females
 ## RKC fishery and test fishery
@@ -111,6 +102,7 @@ pot_sum %>%
 
 ## extrapolate to weight using observer measure pot and average wt data
 obs_meas %>%
+  mutate(stock = "TR") %>%
   # # add and filter for biotwine status
   # left_join(pot_sum %>%
   #             dplyr::select(fishery, trip, adfg, sampdate, spn),
@@ -133,15 +125,15 @@ obs_meas %>%
   ungroup() %>%
   dplyr::select(-avg_wt, -sex) %>%
   filter(!is.na(group)) %>%
-  arrange(opening_year) -> dir_catch_est
+  arrange(crab_year) -> dir_catch_est
 
 ## total male catch (t) in directed fishery (gmacs format)
 dir_catch_est %>%
   filter(group %in% c("sublegal", "tot_legal")) %>%
-  group_by(opening_year) %>%
+  group_by(crab_year) %>%
   summarise(obs = sprintf('%.1f', sum(total_catch_t))) %>% 
   # add columsn required by gmacs
-  mutate(year = opening_year, 
+  mutate(year = crab_year, 
          season = 3, 
          fleet = 1, 
          sex = 1,
@@ -159,10 +151,10 @@ dir_catch_est %>%
 ## female discards (t) in directed fishery (gmacs format)
 dir_catch_est %>%
   filter(group == c("female")) %>%
-  group_by(opening_year) %>%
+  group_by(crab_year) %>%
   summarise(obs = sprintf('%.1f', sum(total_catch_t))) %>%
   # add columsn requiresd by gmacs
-  mutate(year = opening_year,
+  mutate(year = crab_year,
          season = 3, 
          fleet = 1, 
          sex = 2,
@@ -204,6 +196,7 @@ pot_sum %>%
   mutate(sex = ifelse(sex_text == "male", 1, 2)) %>%
   # join to average weight by fishery and sex
   left_join(f_average_wt(obs_meas %>%
+                           mutate(stock = "TR") %>%
                            # left_join(pot_sum %>%
                            #             dplyr::select(fishery, trip, adfg, sampdate, spn),
                            #           by = c("fishery", "trip", "adfg", "sampdate", "spn")) %>%
@@ -219,13 +212,13 @@ pot_sum %>%
   dplyr::select(-obs_effort, -sex, -count, -avg_wt) %>%
   # decipher fishery code and filter for past season, arrange by season
   f_sdr(col = "fishery", type = "fishery_code") %>%
-  arrange(opening_year) -> crab_fishery_bycatch_est
+  arrange(crab_year) -> crab_fishery_bycatch_est
 
 ## total male catch (t) in tanner crab fishery e166 (gmacs format)
 crab_fishery_bycatch_est %>%
   filter(sex_text == "male") %>%
   mutate(obs = sprintf('%.3f', total_catch_t)) %>%
-  mutate(year = opening_year, 
+  mutate(year = crab_year, 
          season = 5, 
          fleet = 3, 
          sex = 1,
@@ -247,7 +240,7 @@ crab_fishery_bycatch_est %>%
 crab_fishery_bycatch_est %>%
   filter(sex_text == "female") %>%
   mutate(obs = sprintf('%.3f', total_catch_t)) %>%
-  mutate(year = opening_year, 
+  mutate(year = crab_year, 
          season = 5, 
          fleet = 3, 
          sex = 2,
@@ -273,7 +266,7 @@ crab_fishery_bycatch_est %>%
 #   filter(substring(fishery, 1, 2) %in% c("TR", "XR")) %>%
 #   # decihper fishery code and filter for most recent season
 #   f_sdr(col = "fishery", type = "fishery_code") %>%
-#   filter(opening_year == as.numeric(substring(season, 1, 4))) %>%
+#   filter(crab_year == as.numeric(substring(season, 1, 4))) %>%
 #   # save output
 #   write_csv(here("bbrkc/output", "item3_fish_ticket_summary.csv"))
 
@@ -309,7 +302,7 @@ obs_meas %>%
   # add opening year in again
   f_sdr(., col = "fishery", type = "fishery_code") %>%
   # normalise to sum to 1
-  group_by(opening_year) %>%
+  group_by(crab_year) %>%
   # compute proportion in size bin and effective number of samples
   mutate(prop =  sprintf('%.4f', total / sum(total)),
          nsamp = min(0.05*sum(total), 100),
@@ -319,7 +312,7 @@ obs_meas %>%
   dplyr::select(-total) %>%
   pivot_wider(names_from = "size_bin", values_from = "prop") %>%
   # additional data
-  mutate(year = opening_year,
+  mutate(year = crab_year,
          season = 3, 
          fleet = 1, 
          sex = 1,
@@ -358,7 +351,7 @@ obs_meas %>%
   # add opening year in again
   f_sdr(., col = "fishery", type = "fishery_code") %>%
   # normalise to sum to 1
-  group_by(opening_year) %>%
+  group_by(crab_year) %>%
   mutate(prop =  sprintf('%.4f', total / sum(total)),
          nsamp = min(0.05*sum(total), 50),
          ncrab = paste0("#", sum(total))) %>%
@@ -367,7 +360,7 @@ obs_meas %>%
   dplyr::select(-total) %>%
   pivot_wider(names_from = "size_bin", values_from = "prop", names_sort = T) %>%
   # additional data
-  mutate(year = opening_year,
+  mutate(year = crab_year,
          season = 3, 
          fleet = 1, 
          sex = 2,
@@ -401,7 +394,7 @@ dock %>%
              by = c("fishery", "size_bin")) %>%
   replace_na(list(total = 0)) %>%
   f_sdr(., col = "fishery", type = "fishery_code") %>%
-  group_by(opening_year, fishery) %>%
+  group_by(crab_year, fishery) %>%
   mutate(prop =  sprintf('%.4f', total / sum(total)),
          nsamp = min(0.05*sum(total), 100),
          ncrab = sum(total)) %>%
@@ -410,7 +403,7 @@ dock %>%
   dplyr::select(-total) %>%
   pivot_wider(names_from = "size_bin", values_from = "prop", names_sort = T) %>%
   # additional data
-  mutate(year = opening_year,
+  mutate(year = crab_year,
          season = 3, 
          fleet = 1, 
          sex = 1,
@@ -456,7 +449,7 @@ obs_meas %>%
   # add opening year in again
   f_sdr(., col = "fishery", type = "fishery_code") %>%
   # normalise to sum to 1 across both sexes
-  group_by(opening_year, .drop = F) %>%
+  group_by(crab_year, .drop = F) %>%
   mutate(prop =  sprintf('%.4f', total / sum(total)),
          nsamp = min(0.05*sum(total), 50),
          ncrab = paste0("#", sum(total))) %>%
@@ -469,7 +462,7 @@ obs_meas %>%
 tt_size_comp %>%
   filter(sex == "male") %>%
   # additional data
-  mutate(year = opening_year,
+  mutate(year = crab_year,
          season = 5, 
          fleet = 1, 
          sex = 1,
@@ -489,7 +482,7 @@ tt_size_comp %>%
   mutate(`140` =  sprintf('%.4f', `140` + `145` + `150` + `155` + `160`)) %>%
   dplyr::select(-`145`, -`150`, -`155`, -`160`) %>%
   # additional data
-  mutate(year = opening_year,
+  mutate(year = crab_year,
          season = 5, 
          fleet = 1, 
          sex = 2,
@@ -504,4 +497,26 @@ tt_size_comp %>%
 
   
   
- 
+
+
+# item 7 ---- 
+
+ft %>% 
+  # combine bbrkc tf and directed fishery
+  mutate(fishery = gsub("XR|CR", "TR", fishery)) %>%
+  
+  #filter(fishery == "TR95")
+  
+  filter(substring(fishery, 1, 2) == "TR") %>%
+  f_crab_year() %>%
+  # summarise by year
+  group_by(crab_year) %>%
+  summarise(retained_lb = sum(live_lbs + deadloss_lbs, na.rm = T),
+            retained_t = retained_lb * 0.000453592) %>%
+  transmute(`#year` = crab_year,
+            seas = 3, fleet = 1, sex = 1, 
+            obs = sprintf("%.1f", retained_t), cv = 0.03, 
+            type = 1, units = 1, mult = 1, effort = 0, discard_mortality = 0.2) %>%
+  write_delim(here("bbrkc/output", "item7_bbrkc_directed_retained_catch.txt"), delim = "\t", col_names = F, na = "")
+  
+  
