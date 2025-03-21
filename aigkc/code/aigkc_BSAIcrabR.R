@@ -5,6 +5,7 @@
 ## last updated: 3/6/2025
 
 # load ----
+devtools::install_github("commfish/BSAIcrabR", force = T)
 library(BSAIcrabR)
 
 # data inputs ----
