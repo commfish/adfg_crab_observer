@@ -6,7 +6,7 @@
 
 # load ----
 
-# devtools::install_github("commfish/BSAIcrabR", force = T)
+devtools::install_github("commfish/BSAIcrabR", force = T)
 library(BSAIcrabR)
 
 # data ----
@@ -124,7 +124,7 @@ get_retained_catch(ft_data = ft_dir_inc) %>%
 
 get_total_catch(pot_data = pot_sum, 
                 crab_data = obs_meas, 
-                ft_data = dir_effort, stock = "BSTC") %>% 
+                ft_data = dir_effort, stock = "BSTC") %>% print(n = 1000)
   write_csv("./tanner_crab/output/2025/total_catch.csv")
 
 get_discards(retained_catch = get_retained_catch(ft_data = ft_dir_inc),
