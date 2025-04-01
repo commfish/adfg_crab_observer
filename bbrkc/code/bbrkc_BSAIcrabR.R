@@ -107,24 +107,28 @@ read_csv("../adfg_crab_observer/misc/data/fish_ticket_timeseries/Q_dir_inc_fish_
 
 # retained catch ----
 
-get_retained_catch(ft_data = ft_dir_inc) %>%
+get_retained_catch(ft_data = ft_dir_inc, stock = "BBRKC") %>%
+  add_target_stock() %>%
   write_csv("./bbrkc/output/2025/retained_catch.csv")
 
 # total catch ----
 
 get_total_catch(pot_data = pot_sum, crab_data = obs_meas, ft_data = dir_effort, stock = "BBRKC") %>% 
+  add_target_stock() %>%
   write_csv("./bbrkc/output/2025/total_catch.csv")
 
 # crab fishery discards ----
 
-get_discards(retained_catch = get_retained_catch(ft_data = ft_dir_inc),
+get_discards(retained_catch = get_retained_catch(ft_data = ft_dir_inc, stock = "BBRKC"),
              total_catch = get_total_catch(pot_data = pot_sum, crab_data = obs_meas, ft_data = dir_effort, stock = "BBRKC"),
              stock = "BBRKC") %>%
+  add_target_stock() %>% 
   write_csv("./bbrkc/output/2025/discards.csv")
 
 # retained size comp ----
 
 get_dockside_comp(data = dock, by = NULL) %>% 
+  add_target_stock() %>%
   write_csv("./bbrkc/output/2025/retained_catch_composition.csv")
 
 # observer size comp ----
@@ -133,10 +137,12 @@ get_observer_comp(data = obs_meas, by = "sex") -> obs_comp
 
 ## directed fishery
 obs_comp %>% filter(substring(fishery, 1, 2) == "TR") %>%
+  add_target_stock() %>%
   write_csv("./bbrkc/output/2025/directed_total_composition.csv")
 
 ## e166 tanner crab
 obs_comp %>% filter(substring(fishery, 1, 2) == "TT") %>%
+  add_target_stock() %>%
   write_csv("./bbrkc/output/2025/tanner_bycatch_composition.csv")
 
 

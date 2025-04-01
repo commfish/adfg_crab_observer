@@ -2,11 +2,11 @@
 
 ## Example BSTC workflow using BSAIcrabR
 ## tyler jackson
-## 3/6/2025
+## 4/1/2025
 
 # load ----
 
-devtools::install_github("commfish/BSAIcrabR", force = T)
+#devtools::install_github("commfish/BSAIcrabR", force = T)
 library(BSAIcrabR)
 
 # data ----
@@ -117,24 +117,27 @@ readRDS("../adfg_crab_observer/misc/data/fish_ticket_timeseries/fish_ticket_stat
 
 # retained catch ----
 
-get_retained_catch(ft_data = ft_dir_inc) %>%
+get_retained_catch(ft_data = ft_dir_inc, stock = "BSTC") %>%
  write_csv("./tanner_crab/output/2025/retained_catch.csv")
 
 # total catch ----
 
 get_total_catch(pot_data = pot_sum, 
                 crab_data = obs_meas, 
-                ft_data = dir_effort, stock = "BSTC") %>% print(n = 1000)
+                ft_data = dir_effort, stock = "BSTC") %>% 
+  add_target_stock() %>%
   write_csv("./tanner_crab/output/2025/total_catch.csv")
 
-get_discards(retained_catch = get_retained_catch(ft_data = ft_dir_inc),
+get_discards(retained_catch = get_retained_catch(ft_data = ft_dir_inc, stock = "BSTC"),
              total_catch = get_total_catch(pot_data = pot_sum, crab_data = obs_meas, ft_data = dir_effort, stock = "BSTC"), 
              stock = "BSTC") %>% 
+  add_target_stock() %>% 
   write_csv("./tanner_crab/output/2025/bstc_discards.csv")
 
 # retained size comp ----
 
 get_dockside_comp(data = dock, by = "shell", lump = T) %>% 
+  add_target_stock() %>%
   write_csv("./tanner_crab/output/2025/retained_catch_composition.csv")
 
 # observer size comp ----
@@ -143,10 +146,12 @@ obs_comp <- get_observer_comp(data = obs_meas, by = c("sex", "shell"), lump = T)
 
 ## directed fishery
 obs_comp %>% filter(substring(fishery, 1, 2) %in% c("TT", "QT")) %>%
+  add_target_stock() %>%
   write_csv("./tanner_crab/output/2025/directed_total_composition.csv")
 
 ## all other crab fisheries
 obs_comp %>% filter(!(substring(fishery, 1, 2) %in% c("TT", "QT"))) %>%
+  add_target_stock() %>%
   write_csv("./tanner_crab/output/2025/crab_bycatch_composition.csv")
 
 
