@@ -39,7 +39,7 @@ read_csv("../adfg_crab_observer/misc/data/fish_ticket_timeseries/Q_dir_inc_fish_
               filter(!grepl("Grand", seasons)) %>%
               mutate(year = substring(seasons, 3, 4)) %>%
               transmute(year, TT = ebt_directed_effort, TR = bbr_directed_effort) %>%
-              full_join(readRDS("../adfg_crab_observer/misc/data/fish_ticket_timeseries/fish_ticket_stat_area_summary_2_26_25.RDS") %>%
+              full_join(readRDS("../adfg_crab_observer/misc/data/fish_ticket_timeseries/fish_ticket_stat_area_summary_7_31_25.RDS") %>%
                           filter(substring(fishery, 1, 2) == "XR") %>%
                           mutate(year = substring(fishery, 3, 4)) %>%
                           group_by(year) %>%
@@ -57,7 +57,7 @@ read_csv("../adfg_crab_observer/misc/data/fish_ticket_timeseries/Q_dir_inc_fish_
   # join to prerationalized doug pengilly data
   bind_rows(dir_effort_prerat) %>%
   # other fisheries
-  bind_rows(readRDS("../adfg_crab_observer/misc/data/fish_ticket_timeseries/fish_ticket_stat_area_summary_2_26_25.RDS") %>%
+  bind_rows(readRDS("../adfg_crab_observer/misc/data/fish_ticket_timeseries/fish_ticket_stat_area_summary_7_31_25.RDS") %>%
               filter(!(substring(fishery, 1, 2) %in% c("QO", "TT", "TR", "QT", "XR"))) %>%
               filter(!(fishery %in% c("2005 before rationalized", "Sheet1"))) %>%
               group_by(fishery, crab_year) %>%
@@ -70,7 +70,7 @@ read_csv("../adfg_crab_observer/misc/data/fish_ticket_timeseries/Q_dir_inc_fish_
   summarise(effort = sum(effort)) %>% ungroup -> dir_effort
 
 ## fish ticket summary by stat area
-readRDS("../adfg_crab_observer/misc/data/fish_ticket_timeseries/fish_ticket_stat_area_summary_2_26_25.RDS") %>%
+readRDS("../adfg_crab_observer/misc/data/fish_ticket_timeseries/fish_ticket_stat_area_summary_7_31_25.RDS") %>%
   filter(fishery != "QT incidentals",
          fishery != "TT incidentals",
          substring(fishery, 2, 2) == "T",
